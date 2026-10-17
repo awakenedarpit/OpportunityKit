@@ -45,21 +45,50 @@ streamlit run app.py
 
 Open the local URL Streamlit prints, usually `http://localhost:8501`.
 
-### Optional local AI setup
+### Local Gemma + Ollama setup
 
-Install [Ollama](https://ollama.com/download) for macOS, then verify it:
+Install [Ollama for macOS](https://ollama.com/download), open the Ollama app once, and verify the local service:
 
 ```bash
 ollama --version
+curl http://127.0.0.1:11434/api/tags
+```
+
+Download one model explicitly. OpportunityKit never downloads models automatically when the app starts:
+
+```bash
+# Recommended starting point
 ollama pull gemma4:e4b
-# lighter fallback for machines that need it:
+
+# Lighter fallback if E4B is too slow or memory constrained
 ollama pull gemma4:e2b
+
 ollama list
 ```
 
-The current Ollama and Google documentation list `gemma4:e4b` and `gemma4:e2b` as supported Gemma 4 tags. The E4B download is listed at roughly 6.6–9.5 GB and E2B at roughly 4.6–7.5 GB on the Ollama model page; disk usage is not the same as runtime memory usage. A 16 GB MacBook may need the E2B fallback depending on other workloads and available unified memory.
+The current Ollama and Google documentation list `gemma4:e4b` and `gemma4:e2b` as supported Gemma 4 tags. The E4B download is listed at roughly 6.6–9.5 GB and E2B at roughly 4.6–7.5 GB on the Ollama model page; disk usage is not the same as runtime memory usage. Choose based on your Mac's available resources rather than assuming a specific processor or RAM configuration.
 
-OpportunityKit only calls Ollama at `localhost` through the official Python library. It does not silently send profiles or prompts to a cloud model. The Fit Report prompt contains only the selected profile fields, selected opportunity, and deterministic rule results. Structured JSON output is requested and validated before display.
+OpportunityKit only accepts loopback Ollama URLs (`127.0.0.1`, `localhost`, or `::1`) through the official Python library. It rejects remote endpoints, does not silently send profiles or prompts to a cloud model, and does not require an API key. The Fit Report prompt contains only the selected profile fields, selected opportunity, and deterministic rule results. Structured JSON output is requested and validated before display.
+
+#### Configure the model and local URL
+
+The defaults are `http://127.0.0.1:11434`, `gemma4:e4b`, and a 60-second request timeout. Change them without editing Python:
+
+```bash
+export OPPORTUNITYKIT_OLLAMA_URL=http://127.0.0.1:11434
+export OPPORTUNITYKIT_MODEL=gemma4:e4b
+export OPPORTUNITYKIT_OLLAMA_TIMEOUT=60
+streamlit run app.py
+```
+
+You can copy `.env.example` as a reference, but the app intentionally does not load `.env` automatically. Export the variables in the same terminal session that starts Streamlit.
+
+#### Troubleshooting
+
+- **Ollama is offline:** start the Ollama macOS app, confirm `curl http://127.0.0.1:11434/api/tags` responds, and restart Streamlit. The app remains usable and shows a rule-based Fit Report fallback.
+- **Model not found:** run `ollama list`, then either `ollama pull gemma4:e4b` or set `OPPORTUNITYKIT_MODEL=gemma4:e2b`. The app never pulls a model on your behalf.
+- **Generation is slow:** increase `OPPORTUNITYKIT_OLLAMA_TIMEOUT` or use `gemma4:e2b`. The deterministic eligibility result is available before the AI report.
+- **Invalid or invented output:** the response is schema-validated and checked against the deterministic eligibility status. Invalid output is discarded and the grounded fallback is shown.
 
 ## Tests
 
@@ -67,7 +96,14 @@ OpportunityKit only calls Ollama at `localhost` through the official Python libr
 pytest -q
 ```
 
-The tests cover eligible, conflicting, and incomplete profiles; relevance components; SQLite save/unsave and status updates; and the grounded fallback report. Live Ollama inference is not claimed as tested in environments where Ollama is not installed.
+The tests cover eligible, conflicting, and incomplete profiles; relevance components; SQLite save/unsave and status updates; grounded fallback behavior; local-only endpoint validation; offline Ollama; missing models; and invalid model output. Run the complete suite with:
+
+```bash
+python -m compileall -q app.py src tests
+pytest -q
+```
+
+Live Gemma inference requires Ollama and downloaded model weights on your Mac. It is not claimed as tested in environments where Ollama is not installed.
 
 ## Dataset format
 
