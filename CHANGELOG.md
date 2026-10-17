@@ -1,13 +1,9 @@
-# Changelog
 
-## 2026-10-17 — Premium UI redesign
+## 2026-10-17 — Local AI integration and verification
 
-- Replaced the single-screen Streamlit layout with a cohesive multi-page workspace.
-- Added Overview dashboard with real saved, in-progress, and deadline metrics.
-- Added Discover filters for category, location, eligibility status, search, and sorting.
-- Added dedicated Opportunity Details workspace with source and freshness context.
-- Redesigned Fit Report as the signature evidence-based experience.
-- Added Saved Opportunities and Application Tracker views with status and checklist editing.
-- Grouped Student Profile fields into clearer sections with validation and local-save feedback.
-- Added shared visual tokens, responsive layout rules, reusable status badges, score displays, empty states, and trust copy.
-- Preserved deterministic eligibility, relevance ranking, local Ollama integration, SQLite persistence, demo-data labeling, and existing tests.
+- Added environment-driven local Ollama configuration for URL, model tag, and timeout.
+- Restricted AI calls to loopback URLs and prevented automatic model downloads.
+- Added installed-model checks and explicit fallback reasons for offline, missing-model, timeout, and invalid-output cases.
+- Preserved deterministic eligibility as the authoritative result and rejected model responses that attempt to change it.
+- Added tests for configuration, remote endpoint rejection, offline Ollama, missing models, and invalid output.
+- Expanded README setup and troubleshooting instructions and added `.env.example` and `DECISIONS.md`.
