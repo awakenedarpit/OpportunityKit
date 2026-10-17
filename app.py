@@ -32,6 +32,7 @@ html, body, [class*="css"] { font-family: Inter, ui-sans-serif, -apple-system, B
 [data-testid="stSidebar"] .stRadio > div { gap:.3rem; }
 [data-testid="stSidebar"] label { border-radius:7px; padding:.62rem .7rem; color:#b8c4d8; font-weight:600; font-size:.84rem; }
 [data-testid="stSidebar"] label:hover { background:#162b50; color:#fff; }
+[data-testid="stSidebar"] [data-testid="stRadioOption"]:has(input:checked) { background:#1b355d; color:#fff; border-left:3px solid #75e6c4; padding-left:calc(.7rem - 3px); }
 [data-testid="stSidebar"] [data-testid="stCaptionContainer"] { color:#7f91ad; }
 h1,h2,h3,h4 { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color:var(--ink); letter-spacing:-.025em; }
 h1 { font-size:2.35rem !important; line-height:1.1; margin:.25rem 0 .55rem; }
@@ -117,7 +118,9 @@ small, .muted { color:var(--muted); }
 .fit-chip.good { color:var(--green); background:var(--green-soft); border-color:#c9ecdf; }
 .fit-chip.bad { color:var(--red); background:var(--red-soft); border-color:#f4cbd0; }
 @media (prefers-reduced-motion: reduce) { *, *:before, *:after { scroll-behavior:auto !important; transition:none !important; animation:none !important; } }
+@media (max-width: 1100px) { .block-container { padding-left:2rem; padding-right:2rem; } }
 @media (max-width: 800px) { .block-container { padding:1.25rem 1rem 3rem; } h1 { font-size:1.8rem !important; } .hero { padding:1.4rem; } .opp-card { min-height:0; } .feature-strip { grid-template-columns:repeat(2,1fr); } .opportunity-row { grid-template-columns:1fr 1fr; gap:.7rem; padding:1rem 0; } .opportunity-row .row-primary { grid-column:1 / -1; } .row-actions { grid-column:1 / -1; } }
+@media (max-width: 520px) { .feature-strip { grid-template-columns:1fr; } .hero h1 { font-size:1.65rem !important; } .results-head { align-items:start; gap:.5rem; flex-direction:column; } }
 </style>
 """, unsafe_allow_html=True)
 
