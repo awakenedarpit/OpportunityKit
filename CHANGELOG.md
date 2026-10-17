@@ -1,4 +1,12 @@
 
+## 2026-10-17 — Premium UI/UX reset
+
+- Added a live visual audit in `UI_AUDIT.md` before implementation.
+- Reworked the shell into a dark navigation rail with clearer workspace separation.
+- Replaced the repeated Discover card grid with a denser opportunity index showing identity, deadline, fit, and actions in one row.
+- Tightened type scale, spacing, border, radius, and shadow rules for a more editorial product feel.
+- Preserved deterministic eligibility, relevance scoring, SQLite persistence, local Ollama boundaries, and all existing interactions.
+
 ## 2026-10-17 — Product identity and experience upgrade
 
 - Added original compass-and-path logo assets, favicon, wordmark variants, and `BRAND_GUIDELINES.md`.

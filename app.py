@@ -14,7 +14,7 @@ from src.ollama_client import generate_fit_report
 from src.storage import Storage
 
 ROOT = Path(__file__).parent
-LOGO_LIGHT_DATA = "data:image/svg+xml;base64," + base64.b64encode((ROOT / "assets" / "opportunitykit-logo-light.svg").read_bytes()).decode()
+LOGO_LIGHT_DATA = "data:image/svg+xml;base64," + base64.b64encode((ROOT / "assets" / "opportunitykit-logo-dark.svg").read_bytes()).decode()
 CATEGORIES = ["Internship", "Scholarship", "Hackathon", "Competition", "Fellowship"]
 STATUSES = ["Interested", "Planning", "Applied", "Completed"]
 NAV_ITEMS = ["Overview", "Discover", "Saved opportunities", "Application tracker", "Student profile", "About"]
@@ -26,12 +26,13 @@ st.markdown("""
  :root { --ink:#0b1933; --ink-2:#263858; --muted:#65738c; --line:#dfe5eb; --surface:#fff; --canvas:#f7f7f2; --brand:#168b79; --brand-dark:#0f665a; --brand-soft:#e3f7f0; --violet:#7666d8; --violet-soft:#eeeaff; --green:#13795b; --green-soft:#e5f5ef; --amber:#9a6200; --amber-soft:#fff4d9; --red:#a23b45; --red-soft:#fdebed; }
 html, body, [class*="css"] { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color:var(--ink); }
 .stApp { background:var(--canvas); }
-.block-container { max-width:1280px; padding:2.25rem 3rem 4rem; }
-[data-testid="stSidebar"] { background:#fff; border-right:1px solid var(--line); }
+.block-container { max-width:1180px; padding:2.6rem 3.5rem 4.5rem; }
+[data-testid="stSidebar"] { background:var(--ink); border-right:0; min-width:252px; max-width:252px; }
 [data-testid="stSidebar"] > div:first-child { padding:1.7rem 1.1rem; }
 [data-testid="stSidebar"] .stRadio > div { gap:.3rem; }
-[data-testid="stSidebar"] label { border-radius:10px; padding:.55rem .65rem; color:var(--ink-2); font-weight:600; }
-[data-testid="stSidebar"] label:hover { background:var(--brand-soft); }
+[data-testid="stSidebar"] label { border-radius:7px; padding:.62rem .7rem; color:#b8c4d8; font-weight:600; font-size:.84rem; }
+[data-testid="stSidebar"] label:hover { background:#162b50; color:#fff; }
+[data-testid="stSidebar"] [data-testid="stCaptionContainer"] { color:#7f91ad; }
 h1,h2,h3,h4 { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color:var(--ink); letter-spacing:-.025em; }
 h1 { font-size:2.35rem !important; line-height:1.1; margin:.25rem 0 .55rem; }
 h2 { font-size:1.55rem !important; margin:0; }
@@ -48,7 +49,8 @@ small, .muted { color:var(--muted); }
 .brand img { width:178px; height:auto; display:block; }
 .brand-name { font-weight:800; font-size:1.05rem; letter-spacing:-.03em; }
 .brand-sub { color:var(--muted); font-size:.72rem; margin-top:.1rem; }
-.sidebar-note { margin-top:2rem; padding:.85rem; background:var(--canvas); border:1px solid var(--line); border-radius:10px; font-size:.75rem; color:var(--muted); line-height:1.5; }
+.sidebar-note { margin-top:2rem; padding:.9rem; background:#122544; border:1px solid #263d62; border-radius:8px; font-size:.75rem; color:#afbdd1; line-height:1.5; }
+.sidebar-note b { color:#75e6c4; }
 .eyebrow { color:var(--brand); text-transform:uppercase; letter-spacing:.12em; font-size:.68rem; font-weight:800; margin-bottom:.45rem; }
 .page-intro { margin-bottom:1.6rem; }
 .page-intro p { color:var(--muted); margin-top:.25rem; max-width:700px; }
@@ -59,15 +61,15 @@ small, .muted { color:var(--muted); }
 .hero-kicker { color:#75e6c4; text-transform:uppercase; letter-spacing:.14em; font-size:.68rem; font-weight:800; margin-bottom:.45rem; }
 .hero-actions { display:flex; gap:.65rem; align-items:center; margin-top:1.1rem; }
 .hero .stTextInput input { background:#fff; }
-.surface { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:1.2rem; box-shadow:0 4px 14px rgba(29,44,75,.03); }
-.metric-card { background:#fff; border:1px solid var(--line); border-radius:13px; padding:1rem 1.15rem; min-height:106px; }
+.surface { background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:1.2rem; box-shadow:none; }
+.metric-card { background:#fff; border:1px solid var(--line); border-radius:8px; padding:1rem 1.15rem; min-height:106px; }
 .metric-label { color:var(--muted); font-size:.76rem; font-weight:600; }
 .metric-value { font-family: Inter, ui-sans-serif, sans-serif; color:var(--ink); font-size:1.75rem; font-weight:800; margin-top:.4rem; }
 .metric-hint { color:var(--muted); font-size:.72rem; margin-top:.15rem; }
 .section-head { display:flex; justify-content:space-between; align-items:center; margin:1.7rem 0 .85rem; }
 .section-head h2 { font-size:1.15rem !important; }
 .section-head span { color:var(--muted); font-size:.8rem; }
-.opp-card { background:#fff; border:1px solid var(--line); border-radius:14px; padding:1.15rem; min-height:248px; box-shadow:0 4px 14px rgba(29,44,75,.03); }
+.opp-card { background:#fff; border:1px solid var(--line); border-radius:10px; padding:1.15rem; min-height:248px; box-shadow:none; }
 .opp-card h3 { margin:.7rem 0 .35rem; min-height:2.65rem; }
 .opp-card p { font-size:.82rem; color:var(--muted); margin:.35rem 0; }
 .card-footer { border-top:1px solid var(--line); margin-top:1rem; padding-top:.75rem; }
@@ -79,14 +81,14 @@ small, .muted { color:var(--muted); }
 .status.not { background:var(--red-soft); color:var(--red); }
 .status.neutral { background:#eff1f5; color:var(--ink-2); }
 .score { font-family:'Plus Jakarta Sans'; color:var(--brand-dark); font-weight:800; }
-.detail-hero { background:#fff; border:1px solid var(--line); border-radius:16px; padding:1.55rem; margin-bottom:1.1rem; }
+.detail-hero { background:#fff; border:1px solid var(--line); border-radius:10px; padding:1.55rem; margin-bottom:1.1rem; }
 .detail-hero h1 { font-size:1.8rem !important; }
 .detail-meta { color:var(--muted); font-size:.82rem; }
 .rule-box { border-radius:12px; padding:1rem; border:1px solid var(--line); background:#fff; }
 .rule-box.green { background:var(--green-soft); border-color:#c9ecdf; }
 .rule-box.amber { background:var(--amber-soft); border-color:#f3dfab; }
 .rule-box.red { background:var(--red-soft); border-color:#f4cbd0; }
-.report-panel { background:#fff; border:1px solid var(--line); border-radius:14px; padding:1.3rem; margin-bottom:1rem; }
+.report-panel { background:#fff; border:1px solid var(--line); border-radius:10px; padding:1.3rem; margin-bottom:1rem; }
 .report-panel h3 { margin-top:0; }
 .report-score { display:flex; align-items:center; gap:1.1rem; padding:1rem 0 .35rem; }
 .score-number { font-family: Inter, ui-sans-serif, sans-serif; font-size:2.8rem; font-weight:800; color:var(--brand); letter-spacing:-.06em; }
@@ -100,8 +102,22 @@ small, .muted { color:var(--muted); }
 .feature-card h3 { margin:.45rem 0 .25rem; font-size:.9rem !important; }
 .feature-card p { color:var(--muted); font-size:.75rem; margin:0; line-height:1.45; }
 .footer-note { border-top:1px solid var(--line); margin-top:2rem; padding-top:1rem; color:var(--muted); font-size:.76rem; }
+.results-head { display:flex; align-items:end; justify-content:space-between; border-bottom:1px solid var(--line); padding:1.55rem 0 .75rem; margin-top:.5rem; }
+.results-head h2 { font-size:1.15rem !important; }
+.opportunity-row { display:grid; grid-template-columns:minmax(0,2.7fr) 1.15fr 1.25fr auto; gap:1rem; align-items:center; background:#fff; border-bottom:1px solid var(--line); padding:1.25rem .25rem; }
+.opportunity-row:first-of-type { border-top:1px solid var(--line); }
+.opportunity-row:hover { background:#fbfcfa; }
+.row-title { font-size:1rem; font-weight:800; color:var(--ink); letter-spacing:-.02em; }
+.row-meta { color:var(--muted); font-size:.78rem; margin-top:.35rem; line-height:1.45; }
+.row-label { color:var(--muted); text-transform:uppercase; letter-spacing:.08em; font-size:.62rem; font-weight:800; margin-bottom:.25rem; }
+.row-value { color:var(--ink-2); font-size:.82rem; font-weight:700; }
+.row-actions { display:flex; gap:.4rem; }
+.row-actions .stButton > button { min-height:2.1rem; padding:.25rem .65rem; font-size:.74rem; }
+.fit-chip { display:inline-block; color:#8b5d00; background:#fff4d9; border:1px solid #f3dfab; border-radius:4px; padding:.2rem .4rem; font-size:.68rem; font-weight:800; }
+.fit-chip.good { color:var(--green); background:var(--green-soft); border-color:#c9ecdf; }
+.fit-chip.bad { color:var(--red); background:var(--red-soft); border-color:#f4cbd0; }
 @media (prefers-reduced-motion: reduce) { *, *:before, *:after { scroll-behavior:auto !important; transition:none !important; animation:none !important; } }
-@media (max-width: 800px) { .block-container { padding:1.25rem 1rem 3rem; } h1 { font-size:1.8rem !important; } .hero { padding:1.4rem; } .opp-card { min-height:0; } .feature-strip { grid-template-columns:repeat(2,1fr); } }
+@media (max-width: 800px) { .block-container { padding:1.25rem 1rem 3rem; } h1 { font-size:1.8rem !important; } .hero { padding:1.4rem; } .opp-card { min-height:0; } .feature-strip { grid-template-columns:repeat(2,1fr); } .opportunity-row { grid-template-columns:1fr 1fr; gap:.7rem; padding:1rem 0; } .opportunity-row .row-primary { grid-column:1 / -1; } .row-actions { grid-column:1 / -1; } }
 </style>
 """, unsafe_allow_html=True)
 
@@ -215,19 +231,23 @@ elif page == "Discover":
     if sort == "Relevance": filtered.sort(key=lambda x: x[1].score, reverse=True)
     elif sort == "Deadline soonest": filtered.sort(key=lambda x: x[0].deadline)
     else: filtered.sort(key=lambda x: x[0].last_verified, reverse=True)
-    st.markdown(f'<div class="section-head"><h2>{len(filtered)} opportunities</h2><span>All listings are clearly marked demo data</span></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="results-head"><div><div class="eyebrow">OPPORTUNITY INDEX</div><h2>{len(filtered)} opportunities</h2></div><span class="muted">Demo catalogue · sort by what matters now</span></div>', unsafe_allow_html=True)
     if not filtered:
         st.markdown('<div class="empty"><div class="eyebrow">NO MATCHES</div><h3>Try a broader search</h3><p class="muted">Remove a filter or search for a broader skill, category, or location.</p></div>', unsafe_allow_html=True)
     else:
-        for start in range(0, len(filtered), 3):
-            cols = st.columns(3)
-            for col, (opp, relevance, eligibility) in zip(cols, filtered[start:start+3]):
-                with col:
-                    st.markdown(f'<div class="opp-card"><span class="badge">{opp.category}</span><span class="badge demo">Demo data</span><h3>{opp.title}</h3><p><b>{opp.organization}</b> · {opp.location}</p><p>{opp.description}</p><p>Deadline <b>{opp.deadline}</b></p><div>{status_html(eligibility.status)} <span class="score" style="float:right">{relevance.score}/100</span></div></div>', unsafe_allow_html=True)
-                    b1, b2 = st.columns(2)
-                    if b1.button("Details", key=f"detail-{opp.id}", use_container_width=True): go("Opportunity details", opp.id)
-                    if b2.button("Saved" if opp.id in saved else "Save", key=f"save-{opp.id}", use_container_width=True):
-                        storage.set_saved(opp.id, opp.id not in saved); st.rerun()
+        for opp, relevance, eligibility in filtered:
+            cols = st.columns([2.7, 1.15, 1.25, 1.45])
+            with cols[0]:
+                st.markdown(f'<div class="row-primary"><div><span class="badge">{opp.category}</span> <span class="badge demo">Demo data</span></div><div class="row-title">{opp.title}</div><div class="row-meta"><b>{opp.organization}</b> · {opp.location}<br>{opp.description}</div></div>', unsafe_allow_html=True)
+            with cols[1]:
+                st.markdown(f'<div class="row-label">Deadline</div><div class="row-value">{opp.deadline}</div><div class="row-meta">Last verified {opp.last_verified}</div>', unsafe_allow_html=True)
+            with cols[2]:
+                chip_class = "good" if eligibility.status.startswith("Eligible") else "bad" if eligibility.status.startswith("Not") else ""
+                st.markdown(f'<div class="row-label">Your fit</div><div class="fit-chip {chip_class}">{eligibility.status.replace(" based on available information", "").replace(" / needs verification", "")}</div><div class="row-meta"><span class="score">{relevance.score}/100</span> relevance</div>', unsafe_allow_html=True)
+            with cols[3]:
+                if st.button("Details", key=f"detail-{opp.id}", use_container_width=True): go("Opportunity details", opp.id)
+                if st.button("Saved" if opp.id in saved else "Save", key=f"save-{opp.id}", use_container_width=True):
+                    storage.set_saved(opp.id, opp.id not in saved); st.rerun()
 
 # DETAIL
 elif page == "Opportunity details":

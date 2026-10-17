@@ -11,3 +11,7 @@ The repository now includes `DECISIONS.md`, `.env.example`, expanded Ollama test
 ## 2026-10-17 — Brand and experience upgrade
 
 OpportunityKit now has an original compass-and-path identity with color, dark, light, monochrome, and favicon SVG assets under `assets/`. The Streamlit shell embeds the light wordmark directly, uses a midnight navy/mint/violet/off-white palette, and presents the four product pillars on Overview: discovery, deterministic fit, progress tracking, and grounded local AI. `BRAND_GUIDELINES.md` documents usage and accessibility rules. Existing data flow, eligibility behavior, local inference boundary, and storage were intentionally preserved.
+
+## 2026-10-17 — Premium UI/UX reset
+
+A live browser audit found the earlier version still looked like a generic Streamlit dashboard: light navigation lacked separation, Discover repeated large cards, and the strongest differentiator—transparent fit assessment—was visually diluted. The reset keeps the existing architecture but moves to a dark navigation rail, warm off-white workspace, tighter editorial hierarchy, fewer decorative containers, and a dense opportunity index. `UI_AUDIT.md` records the reasoning. Live Overview and Discover screens were inspected after the change; 11 tests still pass.
