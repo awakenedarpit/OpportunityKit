@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 96" role="img" aria-labelledby="title">
+  <title id="title">OpportunityKit</title>
+  <rect width="96" height="96" rx="22" fill="#0B1933"/>
+  <path d="M24 66 45 45l10 10 20-25" fill="none" stroke="#75E6C4" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="m62 30 13 0-1 13" fill="none" stroke="#C8B7FF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="24" cy="66" r="5" fill="#F7F7F2"/>
+  <text x="116" y="61" fill="#F7F7F2" font-family="Inter, Arial, sans-serif" font-size="36" font-weight="800" letter-spacing="-1.4">OpportunityKit</text>
+</svg>

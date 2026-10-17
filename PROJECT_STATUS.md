@@ -2,9 +2,9 @@
 
 ## Current milestone
 
-**Local AI integration and end-to-end verification — implemented on `feat/local-ai-verification`.**
+**Product identity and experience upgrade — implemented on `feat/local-ai-verification`.**
 
-The Streamlit app keeps the premium redesign and now has a configurable local Ollama client. It reads the Ollama URL, Gemma model tag, and timeout from environment variables, rejects remote endpoints, checks model availability when possible, and shows an explicit rule-based fallback when local AI is unavailable or unsafe to use.
+The Streamlit app now has an original OpportunityKit logo system, favicon, midnight/mint/violet design tokens, stronger product introduction on Overview, capability cards, trust copy, and reduced-motion support. It keeps the configurable local Ollama client: URL, Gemma model tag, and timeout are environment-driven, remote endpoints are rejected, model availability is checked when possible, and an explicit rule-based fallback appears when local AI is unavailable or unsafe to use.
 
 ## Preserved behavior
 
@@ -17,6 +17,7 @@ Eligibility remains deterministic Python logic. Relevance remains an explainable
 - No live Gemma inference is claimed in the sandbox because Ollama and model weights are not installed here.
 - No model download was performed.
 - The app's existing Streamlit health endpoint was previously verified locally and through the sandbox URL.
+- Logo assets and the brand guidelines document are included under `assets/` and `BRAND_GUIDELINES.md`.
 
 ## Manual steps on the Mac
 

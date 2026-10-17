@@ -29,6 +29,12 @@ Streamlit UI (app.py)
   └── storage.py → local SQLite (profile and saved items)
 ```
 
+## Product identity
+
+OpportunityKit uses an original compass-and-path mark to represent discovery, direction, and progress. The visual system combines midnight navy, mint, soft violet, and off-white surfaces. The logo and favicon variants live in `assets/`, and usage rules are documented in [BRAND_GUIDELINES.md](BRAND_GUIDELINES.md).
+
+The Overview screen serves as the product introduction: it explains the promise, surfaces the four core capabilities, and routes directly into the real discovery workflow. No fake testimonials, user counts, or unsupported outcome claims are used.
+
 ## macOS setup
 
 The core demo requires no API key or paid service.

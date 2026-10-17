@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 from datetime import date
 from pathlib import Path
 
@@ -13,15 +14,16 @@ from src.ollama_client import generate_fit_report
 from src.storage import Storage
 
 ROOT = Path(__file__).parent
+LOGO_LIGHT_DATA = "data:image/svg+xml;base64," + base64.b64encode((ROOT / "assets" / "opportunitykit-logo-light.svg").read_bytes()).decode()
 CATEGORIES = ["Internship", "Scholarship", "Hackathon", "Competition", "Fellowship"]
 STATUSES = ["Interested", "Planning", "Applied", "Completed"]
 NAV_ITEMS = ["Overview", "Discover", "Saved opportunities", "Application tracker", "Student profile", "About"]
 
-st.set_page_config(page_title="OpportunityKit", page_icon="✦", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="OpportunityKit · Discover your next opportunity", page_icon=str(ROOT / "assets" / "favicon.svg"), layout="wide", initial_sidebar_state="expanded")
 
 st.markdown("""
 <style>
- :root { --ink:#17233d; --ink-2:#33415f; --muted:#6f7d96; --line:#e8ebf2; --surface:#fff; --canvas:#f8f9fc; --brand:#4c4ddc; --brand-dark:#3839ba; --brand-soft:#eef0ff; --green:#13795b; --green-soft:#e5f5ef; --amber:#9a6200; --amber-soft:#fff4d9; --red:#a23b45; --red-soft:#fdebed; }
+ :root { --ink:#0b1933; --ink-2:#263858; --muted:#65738c; --line:#dfe5eb; --surface:#fff; --canvas:#f7f7f2; --brand:#168b79; --brand-dark:#0f665a; --brand-soft:#e3f7f0; --violet:#7666d8; --violet-soft:#eeeaff; --green:#13795b; --green-soft:#e5f5ef; --amber:#9a6200; --amber-soft:#fff4d9; --red:#a23b45; --red-soft:#fdebed; }
 html, body, [class*="css"] { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color:var(--ink); }
 .stApp { background:var(--canvas); }
 .block-container { max-width:1280px; padding:2.25rem 3rem 4rem; }
@@ -37,22 +39,25 @@ h3 { font-size:1.05rem !important; line-height:1.3; }
 p { line-height:1.55; }
 small, .muted { color:var(--muted); }
 .stButton > button, .stDownloadButton > button { border-radius:9px; min-height:2.55rem; font-weight:700; border:1px solid var(--line); color:var(--ink); background:#fff; }
-.stButton > button:hover { border-color:var(--brand); color:var(--brand-dark); }
-.stButton > button[kind="primary"] { background:var(--brand); border-color:var(--brand); color:#fff; }
-.stButton > button[kind="primary"]:hover { background:var(--brand-dark); color:#fff; }
+.stButton > button:hover { border-color:var(--brand); color:var(--brand-dark); box-shadow:0 0 0 3px rgba(22,139,121,.10); }
+.stButton > button[kind="primary"] { background:var(--ink); border-color:var(--ink); color:#fff; }
+.stButton > button[kind="primary"]:hover { background:#162b50; color:#fff; }
 .stTextInput input, .stTextArea textarea, .stSelectbox div[data-baseweb="select"] > div, .stNumberInput input { border-radius:9px; border-color:#dfe3ec; }
 .stTextInput input:focus, .stTextArea textarea:focus { border-color:var(--brand); box-shadow:0 0 0 1px var(--brand); }
 .brand { display:flex; align-items:center; gap:.65rem; margin-bottom:2rem; }
-.brand-mark { display:grid; place-items:center; width:2.25rem; height:2.25rem; border-radius:9px; background:var(--brand); color:#fff; font-family:'Plus Jakarta Sans'; font-weight:800; font-size:1.15rem; }
-.brand-name { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:1.05rem; letter-spacing:-.03em; }
+.brand img { width:178px; height:auto; display:block; }
+.brand-name { font-weight:800; font-size:1.05rem; letter-spacing:-.03em; }
 .brand-sub { color:var(--muted); font-size:.72rem; margin-top:.1rem; }
 .sidebar-note { margin-top:2rem; padding:.85rem; background:var(--canvas); border:1px solid var(--line); border-radius:10px; font-size:.75rem; color:var(--muted); line-height:1.5; }
 .eyebrow { color:var(--brand); text-transform:uppercase; letter-spacing:.12em; font-size:.68rem; font-weight:800; margin-bottom:.45rem; }
 .page-intro { margin-bottom:1.6rem; }
 .page-intro p { color:var(--muted); margin-top:.25rem; max-width:700px; }
-.hero { background:var(--ink); color:#fff; border-radius:18px; padding:2.15rem 2.3rem; margin-bottom:1.5rem; box-shadow:0 14px 30px rgba(23,35,61,.12); }
+.hero { background:var(--ink); color:#fff; border-radius:18px; padding:2.35rem 2.5rem; margin-bottom:1.5rem; box-shadow:0 14px 30px rgba(11,25,51,.16); position:relative; overflow:hidden; }
+.hero:after { content:""; position:absolute; width:260px; height:260px; right:-90px; top:-110px; border:1px solid rgba(117,230,196,.35); border-radius:50%; box-shadow:0 0 0 28px rgba(117,230,196,.06), 0 0 0 56px rgba(200,183,255,.06); }
 .hero h1 { color:#fff; max-width:680px; }
 .hero p { color:#bac5dc; max-width:680px; }
+.hero-kicker { color:#75e6c4; text-transform:uppercase; letter-spacing:.14em; font-size:.68rem; font-weight:800; margin-bottom:.45rem; }
+.hero-actions { display:flex; gap:.65rem; align-items:center; margin-top:1.1rem; }
 .hero .stTextInput input { background:#fff; }
 .surface { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:1.2rem; box-shadow:0 4px 14px rgba(29,44,75,.03); }
 .metric-card { background:#fff; border:1px solid var(--line); border-radius:13px; padding:1rem 1.15rem; min-height:106px; }
@@ -89,7 +94,14 @@ small, .muted { color:var(--muted); }
 .empty h3 { margin:.4rem 0; }
 .progress-line { height:.38rem; background:#eaecf3; border-radius:99px; overflow:hidden; }
 .progress-line > div { height:100%; background:var(--brand); border-radius:99px; }
-@media (max-width: 800px) { .block-container { padding:1.25rem 1rem 3rem; } h1 { font-size:1.8rem !important; } .hero { padding:1.4rem; } .opp-card { min-height:0; } }
+.feature-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:.8rem; margin:1.35rem 0 1.7rem; }
+.feature-card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:1rem; min-height:112px; }
+.feature-card .feature-icon { color:var(--brand); font-size:1.2rem; font-weight:900; }
+.feature-card h3 { margin:.45rem 0 .25rem; font-size:.9rem !important; }
+.feature-card p { color:var(--muted); font-size:.75rem; margin:0; line-height:1.45; }
+.footer-note { border-top:1px solid var(--line); margin-top:2rem; padding-top:1rem; color:var(--muted); font-size:.76rem; }
+@media (prefers-reduced-motion: reduce) { *, *:before, *:after { scroll-behavior:auto !important; transition:none !important; animation:none !important; } }
+@media (max-width: 800px) { .block-container { padding:1.25rem 1rem 3rem; } h1 { font-size:1.8rem !important; } .hero { padding:1.4rem; } .opp-card { min-height:0; } .feature-strip { grid-template-columns:repeat(2,1fr); } }
 </style>
 """, unsafe_allow_html=True)
 
@@ -135,7 +147,7 @@ saved = storage.saved_items()
 page = st.session_state.get("page", "Overview")
 
 with st.sidebar:
-    st.markdown('<div class="brand"><div class="brand-mark">✦</div><div><div class="brand-name">OpportunityKit</div><div class="brand-sub">Your opportunity companion</div></div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="brand"><img src="{LOGO_LIGHT_DATA}" alt="OpportunityKit logo" /></div>', unsafe_allow_html=True)
     choice = st.radio("Workspace", NAV_ITEMS, index=NAV_ITEMS.index(page) if page in NAV_ITEMS else 0, label_visibility="collapsed")
     if choice != page:
         st.session_state["page"] = choice
@@ -146,11 +158,12 @@ with st.sidebar:
 # OVERVIEW
 if page == "Overview":
     greeting = f"Welcome back, {profile.name}." if profile.name else "Make your next opportunity easier to find."
-    st.markdown(f'<div class="hero"><div class="eyebrow" style="color:#9da1ff">YOUR OPPORTUNITY DESK</div><h1>{greeting}</h1><p>Discover opportunities that fit your profile, understand the requirements, and move forward with a clear plan.</p></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="hero"><div class="hero-kicker">Discover your next opportunity</div><h1>{greeting}</h1><p>Find internships, scholarships, hackathons and more. Understand your fit, see what is missing, and take the next step with confidence.</p><div class="hero-actions"><span class="badge" style="background:#75e6c4;color:#0b1933">Local-first</span><span style="color:#bac5dc;font-size:.78rem">Rules you can inspect. AI that stays grounded.</span></div></div>', unsafe_allow_html=True)
     search = st.text_input("Search your next opportunity", placeholder="Search by skill, category, or organization", label_visibility="collapsed")
     if search:
         st.session_state["search_query"] = search
         go("Discover")
+    st.markdown('<div class="feature-strip"><div class="feature-card"><div class="feature-icon">⌕</div><h3>Discover clearly</h3><p>Search a curated catalogue with transparent relevance scores.</p></div><div class="feature-card"><div class="feature-icon">✓</div><h3>Know your fit</h3><p>Deterministic Python rules show eligible, unknown and conflicting requirements.</p></div><div class="feature-card"><div class="feature-icon">↗</div><h3>Move forward</h3><p>Save ideas, track application status and keep next steps visible.</p></div><div class="feature-card"><div class="feature-icon">✦</div><h3>Get context</h3><p>Use local Gemma for a grounded Fit Report, with a useful offline fallback.</p></div></div>', unsafe_allow_html=True)
     if not profile.education_level or not profile.skills:
         st.markdown('<div class="surface"><div class="eyebrow">START HERE</div><h2>Complete your profile to unlock better matches</h2><p class="muted">Add your education, skills, and interests once. OpportunityKit will use them to explain which listings deserve your attention.</p></div>', unsafe_allow_html=True)
         if st.button("Build my profile", type="primary"): go("Student profile")
@@ -177,6 +190,7 @@ if page == "Overview":
         c1.markdown(f"**{opp.title}**  \n<span class='muted'>{opp.organization} · {opp.category}</span>", unsafe_allow_html=True)
         c2.markdown(f"Deadline **{opp.deadline}**")
         if c3.button("View", key=f"deadline-{opp.id}"): go("Opportunity details", opp.id)
+    st.markdown('<div class="footer-note">OpportunityKit is a local-first demo. Listings are fictional demo data; always verify deadlines and requirements at the official source.</div>', unsafe_allow_html=True)
 
 # DISCOVER
 elif page == "Discover":
