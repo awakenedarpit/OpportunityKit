@@ -21,6 +21,10 @@ NAV_ITEMS = ["Overview", "Discover", "Saved opportunities", "Application tracker
 
 st.set_page_config(page_title="OpportunityKit · Discover your next opportunity", page_icon=str(ROOT / "assets" / "favicon.svg"), layout="wide", initial_sidebar_state="expanded")
 
+if "theme" not in st.session_state:
+    st.session_state["theme"] = "light"
+theme = st.session_state["theme"]
+
 st.markdown("""
 <style>
  :root { --midnight:#10182b; --ink:#17213a; --ink-2:#17213a; --muted:#596780; --dark-muted:#b8c2d9; --line:#e3e7f0; --surface:#fff; --canvas:#f7f8fc; --brand:#6254e8; --brand-dark:#4f43cc; --brand-soft:#eeeafe; --gold:#d6b779; --green:#16866a; --green-soft:#e5f5ef; --amber:#a86b16; --amber-soft:#fff4df; --red:#c43d52; --red-soft:#fdebed; }
@@ -124,6 +128,59 @@ small, .muted { color:var(--muted); }
 </style>
 """, unsafe_allow_html=True)
 
+common_control_css = """
+<style>
+input, textarea, [data-baseweb="select"] > div { color:#17213A !important; background:#FFFFFF !important; border-color:#DCE2EC !important; }
+input::placeholder, textarea::placeholder { color:#596780 !important; opacity:1 !important; }
+[role="listbox"], [data-baseweb="menu"], [role="option"] { background:#FFFFFF !important; color:#17213A !important; }
+[role="option"]:hover, [role="option"][aria-selected="true"] { background:#EEEAFE !important; color:#17213A !important; }
+[data-baseweb="select"] svg { fill:#596780 !important; color:#596780 !important; }
+.theme-label { color:#B8C2D9; text-transform:uppercase; letter-spacing:.12em; font-size:.62rem; font-weight:800; margin-top:1.4rem; margin-bottom:.3rem; }
+</style>
+"""
+if theme == "dark":
+    theme_css = """
+<style>
+:root { --midnight:#111827; --ink:#F7F8FC; --ink-2:#F7F8FC; --muted:#B8C2D9; --line:#344158; --surface:#202B3D; --canvas:#111827; --brand:#9387FF; --brand-dark:#7D70EF; --brand-soft:#302C50; }
+html, body, [class*="css"] { color:#D7DEEB !important; }
+.stApp, [data-testid="stMain"] { background:#111827 !important; }
+[data-testid="stHeader"], header { background:#111827 !important; }
+[data-testid="stSidebar"] { background:#10182B !important; }
+[data-testid="stSidebar"] label { color:#B8C2D9 !important; }
+[data-testid="stSidebar"] label:hover, [data-testid="stSidebar"] [data-testid="stRadioOption"]:has(input:checked) { background:#302C50 !important; color:#FFFFFF !important; }
+h1,h2,h3,h4, .metric-value, .row-title, .row-value { color:#F7F8FC !important; }
+p, .muted, .row-meta, .detail-meta, .metric-label, .metric-hint, .section-head span, .results-head span { color:#B8C2D9 !important; }
+.surface, .metric-card, .opp-card, .detail-hero, .report-panel, .empty, .feature-card, .opportunity-row { background:#202B3D !important; border-color:#344158 !important; color:#D7DEEB !important; }
+.opportunity-row:hover { background:#26344A !important; }
+.badge.demo { background:#344158 !important; color:#D7DEEB !important; }
+.status.neutral { background:#344158 !important; color:#F7F8FC !important; }
+.stButton > button, .stDownloadButton > button { background:#202B3D !important; color:#F7F8FC !important; border-color:#344158 !important; }
+.stButton > button:hover { border-color:#9387FF !important; color:#FFFFFF !important; }
+.stButton > button[kind="primary"] { background:#9387FF !important; border-color:#9387FF !important; color:#111827 !important; }
+.hero { background:#111827 !important; }
+.hero p { color:#D7DEEB !important; }
+.hero .stTextInput input { background:#202B3D !important; color:#F7F8FC !important; }
+.rule-box { background:#202B3D !important; border-color:#344158 !important; }
+.rule-box.green { background:#17382F !important; border-color:#286B58 !important; }
+.rule-box.amber { background:#493719 !important; border-color:#80602B !important; }
+.rule-box.red { background:#49222D !important; border-color:#813B4A !important; }
+.progress-line { background:#344158 !important; }
+input, textarea, [data-baseweb="select"] > div { color:#F7F8FC !important; background:#202B3D !important; border-color:#3B4961 !important; }
+input::placeholder, textarea::placeholder { color:#B8C2D9 !important; }
+[role="listbox"], [data-baseweb="menu"], [role="option"] { background:#202B3D !important; color:#F7F8FC !important; }
+[role="option"]:hover, [role="option"][aria-selected="true"] { background:#302C50 !important; color:#FFFFFF !important; }
+[data-baseweb="select"] svg { fill:#B8C2D9 !important; color:#B8C2D9 !important; }
+.theme-label { color:#B8C2D9 !important; }
+</style>
+"""
+else:
+    theme_css = """
+<style>
+.stApp, [data-testid="stMain"] { background:#F7F8FC !important; }
+</style>
+"""
+st.markdown(common_control_css + theme_css, unsafe_allow_html=True)
+
 @st.cache_data
 def get_opportunities() -> list[Opportunity]:
     return load_opportunities(ROOT / "data" / "opportunities.json")
@@ -172,6 +229,11 @@ with st.sidebar:
         st.session_state["page"] = choice
         page = choice
     st.markdown('<div class="sidebar-note"><b>Local-first by design</b><br>Your profile and saved opportunities stay on this device. Fit Reports use Gemma through Ollama when available.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="theme-label">Appearance</div>', unsafe_allow_html=True)
+    dark_mode = st.toggle("Dark mode", value=theme == "dark", help="Switch the workspace theme without changing your page or data.")
+    if dark_mode != (theme == "dark"):
+        st.session_state["theme"] = "dark" if dark_mode else "light"
+        st.rerun()
     st.caption("OpportunityKit · demo build")
 
 # OVERVIEW

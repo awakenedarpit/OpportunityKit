@@ -4,7 +4,7 @@
 
 **Premium UI/UX reset — implemented on `feat/local-ai-verification`.**
 
-The Streamlit app now has a dark navigation rail, editorial opportunity index, tighter type and spacing hierarchy, restrained borders/radii, stronger Overview first-run state, original OpportunityKit logo system, favicon, midnight/mint/violet design tokens, and reduced-motion support. It keeps the configurable local Ollama client: URL, Gemma model tag, and timeout are environment-driven, remote endpoints are rejected, model availability is checked when possible, and an explicit rule-based fallback appears when local AI is unavailable or unsafe to use.
+The Streamlit app now has a dark navigation rail, editorial opportunity index, tighter type and spacing hierarchy, restrained borders/radii, stronger Overview first-run state, original OpportunityKit logo system, favicon, the required premium colour tokens, and reduced-motion support. It also has a session-based Light/Dark mode switch with coordinated Streamlit control and dropdown styling. It keeps the configurable local Ollama client: URL, Gemma model tag, and timeout are environment-driven, remote endpoints are rejected, model availability is checked when possible, and an explicit rule-based fallback appears when local AI is unavailable or unsafe to use.
 
 ## Preserved behavior
 
@@ -19,6 +19,7 @@ Eligibility remains deterministic Python logic. Relevance remains an explainable
 - The app's existing Streamlit health endpoint was previously verified locally and through the sandbox URL.
 - Logo assets and the brand guidelines document are included under `assets/` and `BRAND_GUIDELINES.md`.
 - Live Overview and Discover screens were visually inspected in the sandbox browser after the reset.
+- Discover Category dropdown was opened and inspected in both Light and Dark modes; theme switching preserved the Discover page.
 
 ## Manual steps on the Mac
 

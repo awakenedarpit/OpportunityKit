@@ -1,4 +1,11 @@
 
+## 2026-10-17 — Light/Dark mode and dropdown repair
+
+- Added a Light/Dark mode toggle in the sidebar, defaulting to Light mode and stored in Streamlit session state.
+- Added coordinated light and dark tokens for page surfaces, cards, text, buttons, focus states, and semantic panels.
+- Fixed BaseWeb/Streamlit select controls, option lists, search inputs, and form controls so Light mode uses white surfaces and Dark mode uses dark slate surfaces.
+- Verified Discover Category dropdown menus in both themes and confirmed navigation remains on the current page after switching.
+
 ## 2026-10-17 — Premium colour system
 
 - Migrated the application tokens to the required Midnight Navy, Deep Navy, Royal Indigo, Soft Lavender, Champagne Gold, Soft Ivory, Pure White, Slate Grey, and semantic state palette.

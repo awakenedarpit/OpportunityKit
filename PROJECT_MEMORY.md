@@ -19,3 +19,7 @@ A live browser audit found the earlier version still looked like a generic Strea
 ## 2026-10-17 — Exact premium palette
 
 The visual tokens now follow the requested system exactly: Midnight Navy `#10182B`, Deep Navy `#17213A`, Royal Indigo `#6254E8`, Soft Lavender `#EEEAFE`, Champagne Gold `#D6B779`, Soft Ivory `#F7F8FC`, Pure White `#FFFFFF`, Slate Grey `#596780`, Muted Lavender Grey `#B8C2D9`, Border Grey `#E3E7F0`, Success Green `#16866A`, Warning Amber `#A86B16`, and Error Red `#C43D52`. Logo and favicon accents were updated in parallel. The live Overview was refreshed and visually checked after the migration.
+
+## 2026-10-17 — Light/Dark mode and controls
+
+The app now defaults to Light mode and exposes a sidebar Dark mode toggle backed by `st.session_state["theme"]`. The active theme is applied through centralized CSS variables and theme-specific component overrides. Streamlit/BaseWeb select menus, search inputs, text inputs, and forms use white surfaces with navy text in Light mode and `#202B3D` dark-slate surfaces with light text in Dark mode. The Discover Category menu was opened and visually checked in both themes; switching back preserved the Discover page.
