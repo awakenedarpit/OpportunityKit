@@ -1,11 +1,9 @@
 # Project Memory
 
-## 2026-10-17 — Premium redesign
+## 2026-10-17 — Local AI verification milestone
 
-The original app was a compact single-file Streamlit dashboard. The redesign intentionally kept that architecture and changed the presentation layer only. Navigation is stateful through `st.session_state["page"]`, so actions such as Details, Create Fit Report, Browse opportunities, and Build my profile now move to real pages instead of decorative controls.
+The premium UI remains in place. The next milestone hardened `src/ollama_client.py` instead of changing the UI or business rules. Configuration is environment-driven: `OPPORTUNITYKIT_OLLAMA_URL`, `OPPORTUNITYKIT_MODEL`, and `OPPORTUNITYKIT_OLLAMA_TIMEOUT`. The client accepts only loopback Ollama URLs, never downloads models, checks the installed model list when available, and uses the official Ollama Python client with a bounded timeout.
 
-The visual system uses midnight ink, warm off-white canvas, white surfaces, cobalt/indigo actions, slate metadata, and semantic green/amber/red states. The CSS uses system font stacks so the core app does not depend on a remote font service. Demo listings remain visibly labeled, and source/freshness context is repeated at the detail and Fit Report layers.
+The Fit Report flow remains rules first, AI second. Offline services, missing models, slow/error responses, invalid JSON, malformed report shapes, and model attempts to change eligibility all return the useful deterministic fallback and an explicit source reason.
 
-The strongest demo path is Overview → Discover → Opportunity Details → Fit Report → Saved opportunities → Application tracker. The Fit Report still receives deterministic results from Python first; local Gemma only explains supplied evidence and cannot override the result.
-
-Next recommended task: perform browser screenshots at desktop and narrow widths, then open the focused branch as a pull request for review.
+The repository now includes `DECISIONS.md`, `.env.example`, expanded Ollama tests, and exact macOS setup/troubleshooting instructions in `README.md`. Live Gemma inference still requires manual verification on the user's Mac because this sandbox does not have Ollama or model weights.
