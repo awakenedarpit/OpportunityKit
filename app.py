@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 from datetime import date
 from pathlib import Path
 
@@ -13,23 +14,30 @@ from src.ollama_client import generate_fit_report
 from src.storage import Storage
 
 ROOT = Path(__file__).parent
+LOGO_LIGHT_DATA = "data:image/svg+xml;base64," + base64.b64encode((ROOT / "assets" / "opportunitykit-logo-dark.svg").read_bytes()).decode()
 CATEGORIES = ["Internship", "Scholarship", "Hackathon", "Competition", "Fellowship"]
 STATUSES = ["Interested", "Planning", "Applied", "Completed"]
 NAV_ITEMS = ["Overview", "Discover", "Saved opportunities", "Application tracker", "Student profile", "About"]
 
-st.set_page_config(page_title="OpportunityKit", page_icon="✦", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="OpportunityKit · Discover your next opportunity", page_icon=str(ROOT / "assets" / "favicon.svg"), layout="wide", initial_sidebar_state="expanded")
+
+if "theme" not in st.session_state:
+    st.session_state["theme"] = "light"
+theme = st.session_state["theme"]
 
 st.markdown("""
 <style>
- :root { --ink:#17233d; --ink-2:#33415f; --muted:#6f7d96; --line:#e8ebf2; --surface:#fff; --canvas:#f8f9fc; --brand:#4c4ddc; --brand-dark:#3839ba; --brand-soft:#eef0ff; --green:#13795b; --green-soft:#e5f5ef; --amber:#9a6200; --amber-soft:#fff4d9; --red:#a23b45; --red-soft:#fdebed; }
+ :root { --midnight:#10182b; --ink:#17213a; --ink-2:#17213a; --muted:#596780; --dark-muted:#b8c2d9; --line:#e3e7f0; --surface:#fff; --canvas:#f7f8fc; --brand:#6254e8; --brand-dark:#4f43cc; --brand-soft:#eeeafe; --gold:#d6b779; --green:#16866a; --green-soft:#e5f5ef; --amber:#a86b16; --amber-soft:#fff4df; --red:#c43d52; --red-soft:#fdebed; }
 html, body, [class*="css"] { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color:var(--ink); }
 .stApp { background:var(--canvas); }
-.block-container { max-width:1280px; padding:2.25rem 3rem 4rem; }
-[data-testid="stSidebar"] { background:#fff; border-right:1px solid var(--line); }
+.block-container { max-width:1180px; padding:2.6rem 3.5rem 4.5rem; }
+[data-testid="stSidebar"] { background:var(--midnight); border-right:0; min-width:252px; max-width:252px; }
 [data-testid="stSidebar"] > div:first-child { padding:1.7rem 1.1rem; }
 [data-testid="stSidebar"] .stRadio > div { gap:.3rem; }
-[data-testid="stSidebar"] label { border-radius:10px; padding:.55rem .65rem; color:var(--ink-2); font-weight:600; }
-[data-testid="stSidebar"] label:hover { background:var(--brand-soft); }
+[data-testid="stSidebar"] label { border-radius:7px; padding:.62rem .7rem; color:#b8c4d8; font-weight:600; font-size:.84rem; }
+[data-testid="stSidebar"] label:hover { background:#162b50; color:#fff; }
+[data-testid="stSidebar"] [data-testid="stRadioOption"]:has(input:checked) { background:#24204f; color:#fff; border-left:3px solid var(--brand); padding-left:calc(.7rem - 3px); }
+[data-testid="stSidebar"] [data-testid="stCaptionContainer"] { color:#7f91ad; }
 h1,h2,h3,h4 { font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color:var(--ink); letter-spacing:-.025em; }
 h1 { font-size:2.35rem !important; line-height:1.1; margin:.25rem 0 .55rem; }
 h2 { font-size:1.55rem !important; margin:0; }
@@ -37,32 +45,36 @@ h3 { font-size:1.05rem !important; line-height:1.3; }
 p { line-height:1.55; }
 small, .muted { color:var(--muted); }
 .stButton > button, .stDownloadButton > button { border-radius:9px; min-height:2.55rem; font-weight:700; border:1px solid var(--line); color:var(--ink); background:#fff; }
-.stButton > button:hover { border-color:var(--brand); color:var(--brand-dark); }
+.stButton > button:hover { border-color:var(--brand); color:var(--brand-dark); box-shadow:0 0 0 3px rgba(98,84,232,.12); }
 .stButton > button[kind="primary"] { background:var(--brand); border-color:var(--brand); color:#fff; }
 .stButton > button[kind="primary"]:hover { background:var(--brand-dark); color:#fff; }
 .stTextInput input, .stTextArea textarea, .stSelectbox div[data-baseweb="select"] > div, .stNumberInput input { border-radius:9px; border-color:#dfe3ec; }
-.stTextInput input:focus, .stTextArea textarea:focus { border-color:var(--brand); box-shadow:0 0 0 1px var(--brand); }
+.stTextInput input:focus, .stTextArea textarea:focus, .stSelectbox [data-baseweb="select"] > div:focus-within, .stNumberInput input:focus { border-color:var(--brand); box-shadow:0 0 0 2px rgba(98,84,232,.2); }
 .brand { display:flex; align-items:center; gap:.65rem; margin-bottom:2rem; }
-.brand-mark { display:grid; place-items:center; width:2.25rem; height:2.25rem; border-radius:9px; background:var(--brand); color:#fff; font-family:'Plus Jakarta Sans'; font-weight:800; font-size:1.15rem; }
-.brand-name { font-family:'Plus Jakarta Sans'; font-weight:800; font-size:1.05rem; letter-spacing:-.03em; }
+.brand img { width:178px; height:auto; display:block; }
+.brand-name { font-weight:800; font-size:1.05rem; letter-spacing:-.03em; }
 .brand-sub { color:var(--muted); font-size:.72rem; margin-top:.1rem; }
-.sidebar-note { margin-top:2rem; padding:.85rem; background:var(--canvas); border:1px solid var(--line); border-radius:10px; font-size:.75rem; color:var(--muted); line-height:1.5; }
+.sidebar-note { margin-top:2rem; padding:.9rem; background:#122544; border:1px solid #263d62; border-radius:8px; font-size:.75rem; color:#afbdd1; line-height:1.5; }
+.sidebar-note b { color:#d6b779; }
 .eyebrow { color:var(--brand); text-transform:uppercase; letter-spacing:.12em; font-size:.68rem; font-weight:800; margin-bottom:.45rem; }
 .page-intro { margin-bottom:1.6rem; }
 .page-intro p { color:var(--muted); margin-top:.25rem; max-width:700px; }
-.hero { background:var(--ink); color:#fff; border-radius:18px; padding:2.15rem 2.3rem; margin-bottom:1.5rem; box-shadow:0 14px 30px rgba(23,35,61,.12); }
+.hero { background:var(--midnight); color:#fff; border-radius:18px; padding:2.35rem 2.5rem; margin-bottom:1.5rem; box-shadow:0 14px 30px rgba(16,24,43,.16); position:relative; overflow:hidden; }
+.hero:after { content:""; position:absolute; width:260px; height:260px; right:-90px; top:-110px; border:1px solid rgba(98,84,232,.48); border-radius:50%; box-shadow:0 0 0 28px rgba(98,84,232,.08), 0 0 0 56px rgba(214,183,121,.08); }
 .hero h1 { color:#fff; max-width:680px; }
 .hero p { color:#bac5dc; max-width:680px; }
+.hero-kicker { color:var(--gold); text-transform:uppercase; letter-spacing:.14em; font-size:.68rem; font-weight:800; margin-bottom:.45rem; }
+.hero-actions { display:flex; gap:.65rem; align-items:center; margin-top:1.1rem; }
 .hero .stTextInput input { background:#fff; }
-.surface { background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:1.2rem; box-shadow:0 4px 14px rgba(29,44,75,.03); }
-.metric-card { background:#fff; border:1px solid var(--line); border-radius:13px; padding:1rem 1.15rem; min-height:106px; }
+.surface { background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:1.2rem; box-shadow:none; }
+.metric-card { background:#fff; border:1px solid var(--line); border-radius:8px; padding:1rem 1.15rem; min-height:106px; }
 .metric-label { color:var(--muted); font-size:.76rem; font-weight:600; }
 .metric-value { font-family: Inter, ui-sans-serif, sans-serif; color:var(--ink); font-size:1.75rem; font-weight:800; margin-top:.4rem; }
 .metric-hint { color:var(--muted); font-size:.72rem; margin-top:.15rem; }
 .section-head { display:flex; justify-content:space-between; align-items:center; margin:1.7rem 0 .85rem; }
 .section-head h2 { font-size:1.15rem !important; }
 .section-head span { color:var(--muted); font-size:.8rem; }
-.opp-card { background:#fff; border:1px solid var(--line); border-radius:14px; padding:1.15rem; min-height:248px; box-shadow:0 4px 14px rgba(29,44,75,.03); }
+.opp-card { background:#fff; border:1px solid var(--line); border-radius:10px; padding:1.15rem; min-height:248px; box-shadow:none; }
 .opp-card h3 { margin:.7rem 0 .35rem; min-height:2.65rem; }
 .opp-card p { font-size:.82rem; color:var(--muted); margin:.35rem 0; }
 .card-footer { border-top:1px solid var(--line); margin-top:1rem; padding-top:.75rem; }
@@ -74,14 +86,14 @@ small, .muted { color:var(--muted); }
 .status.not { background:var(--red-soft); color:var(--red); }
 .status.neutral { background:#eff1f5; color:var(--ink-2); }
 .score { font-family:'Plus Jakarta Sans'; color:var(--brand-dark); font-weight:800; }
-.detail-hero { background:#fff; border:1px solid var(--line); border-radius:16px; padding:1.55rem; margin-bottom:1.1rem; }
+.detail-hero { background:#fff; border:1px solid var(--line); border-radius:10px; padding:1.55rem; margin-bottom:1.1rem; }
 .detail-hero h1 { font-size:1.8rem !important; }
 .detail-meta { color:var(--muted); font-size:.82rem; }
 .rule-box { border-radius:12px; padding:1rem; border:1px solid var(--line); background:#fff; }
 .rule-box.green { background:var(--green-soft); border-color:#c9ecdf; }
 .rule-box.amber { background:var(--amber-soft); border-color:#f3dfab; }
 .rule-box.red { background:var(--red-soft); border-color:#f4cbd0; }
-.report-panel { background:#fff; border:1px solid var(--line); border-radius:14px; padding:1.3rem; margin-bottom:1rem; }
+.report-panel { background:#fff; border:1px solid var(--line); border-radius:10px; padding:1.3rem; margin-bottom:1rem; }
 .report-panel h3 { margin-top:0; }
 .report-score { display:flex; align-items:center; gap:1.1rem; padding:1rem 0 .35rem; }
 .score-number { font-family: Inter, ui-sans-serif, sans-serif; font-size:2.8rem; font-weight:800; color:var(--brand); letter-spacing:-.06em; }
@@ -89,9 +101,85 @@ small, .muted { color:var(--muted); }
 .empty h3 { margin:.4rem 0; }
 .progress-line { height:.38rem; background:#eaecf3; border-radius:99px; overflow:hidden; }
 .progress-line > div { height:100%; background:var(--brand); border-radius:99px; }
-@media (max-width: 800px) { .block-container { padding:1.25rem 1rem 3rem; } h1 { font-size:1.8rem !important; } .hero { padding:1.4rem; } .opp-card { min-height:0; } }
+.feature-strip { display:grid; grid-template-columns:repeat(4,1fr); gap:.8rem; margin:1.35rem 0 1.7rem; }
+.feature-card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:1rem; min-height:112px; }
+.feature-card .feature-icon { color:var(--brand); font-size:1.2rem; font-weight:900; }
+.feature-card h3 { margin:.45rem 0 .25rem; font-size:.9rem !important; }
+.feature-card p { color:var(--muted); font-size:.75rem; margin:0; line-height:1.45; }
+.footer-note { border-top:1px solid var(--line); margin-top:2rem; padding-top:1rem; color:var(--muted); font-size:.76rem; }
+.results-head { display:flex; align-items:end; justify-content:space-between; border-bottom:1px solid var(--line); padding:1.55rem 0 .75rem; margin-top:.5rem; }
+.results-head h2 { font-size:1.15rem !important; }
+.opportunity-row { display:grid; grid-template-columns:minmax(0,2.7fr) 1.15fr 1.25fr auto; gap:1rem; align-items:center; background:#fff; border-bottom:1px solid var(--line); padding:1.25rem .25rem; }
+.opportunity-row:first-of-type { border-top:1px solid var(--line); }
+.opportunity-row:hover { background:#fbfcfa; }
+.row-title { font-size:1rem; font-weight:800; color:var(--ink); letter-spacing:-.02em; }
+.row-meta { color:var(--muted); font-size:.78rem; margin-top:.35rem; line-height:1.45; }
+.row-label { color:var(--muted); text-transform:uppercase; letter-spacing:.08em; font-size:.62rem; font-weight:800; margin-bottom:.25rem; }
+.row-value { color:var(--ink-2); font-size:.82rem; font-weight:700; }
+.row-actions { display:flex; gap:.4rem; }
+.row-actions .stButton > button { min-height:2.1rem; padding:.25rem .65rem; font-size:.74rem; }
+.fit-chip { display:inline-block; color:#8b5d00; background:#fff4d9; border:1px solid #f3dfab; border-radius:4px; padding:.2rem .4rem; font-size:.68rem; font-weight:800; }
+.fit-chip.good { color:var(--green); background:var(--green-soft); border-color:#c9ecdf; }
+.fit-chip.bad { color:var(--red); background:var(--red-soft); border-color:#f4cbd0; }
+@media (prefers-reduced-motion: reduce) { *, *:before, *:after { scroll-behavior:auto !important; transition:none !important; animation:none !important; } }
+@media (max-width: 1100px) { .block-container { padding-left:2rem; padding-right:2rem; } }
+@media (max-width: 800px) { .block-container { padding:1.25rem 1rem 3rem; } h1 { font-size:1.8rem !important; } .hero { padding:1.4rem; } .opp-card { min-height:0; } .feature-strip { grid-template-columns:repeat(2,1fr); } .opportunity-row { grid-template-columns:1fr 1fr; gap:.7rem; padding:1rem 0; } .opportunity-row .row-primary { grid-column:1 / -1; } .row-actions { grid-column:1 / -1; } }
+@media (max-width: 520px) { .feature-strip { grid-template-columns:1fr; } .hero h1 { font-size:1.65rem !important; } .results-head { align-items:start; gap:.5rem; flex-direction:column; } }
 </style>
 """, unsafe_allow_html=True)
+
+common_control_css = """
+<style>
+input, textarea, [data-baseweb="select"] > div { color:#17213A !important; background:#FFFFFF !important; border-color:#DCE2EC !important; }
+input::placeholder, textarea::placeholder { color:#596780 !important; opacity:1 !important; }
+[role="listbox"], [data-baseweb="menu"], [role="option"] { background:#FFFFFF !important; color:#17213A !important; }
+[role="option"]:hover, [role="option"][aria-selected="true"] { background:#EEEAFE !important; color:#17213A !important; }
+[data-baseweb="select"] svg { fill:#596780 !important; color:#596780 !important; }
+.theme-label { color:#B8C2D9; text-transform:uppercase; letter-spacing:.12em; font-size:.62rem; font-weight:800; margin-top:1.4rem; margin-bottom:.3rem; }
+</style>
+"""
+if theme == "dark":
+    theme_css = """
+<style>
+:root { --midnight:#111827; --ink:#F7F8FC; --ink-2:#F7F8FC; --muted:#B8C2D9; --line:#344158; --surface:#202B3D; --canvas:#111827; --brand:#9387FF; --brand-dark:#7D70EF; --brand-soft:#302C50; }
+html, body, [class*="css"] { color:#D7DEEB !important; }
+.stApp, [data-testid="stMain"] { background:#111827 !important; }
+[data-testid="stHeader"], header { background:#111827 !important; }
+[data-testid="stSidebar"] { background:#10182B !important; }
+[data-testid="stSidebar"] label { color:#B8C2D9 !important; }
+[data-testid="stSidebar"] label:hover, [data-testid="stSidebar"] [data-testid="stRadioOption"]:has(input:checked) { background:#302C50 !important; color:#FFFFFF !important; }
+h1,h2,h3,h4, .metric-value, .row-title, .row-value { color:#F7F8FC !important; }
+p, .muted, .row-meta, .detail-meta, .metric-label, .metric-hint, .section-head span, .results-head span { color:#B8C2D9 !important; }
+.surface, .metric-card, .opp-card, .detail-hero, .report-panel, .empty, .feature-card, .opportunity-row { background:#202B3D !important; border-color:#344158 !important; color:#D7DEEB !important; }
+.opportunity-row:hover { background:#26344A !important; }
+.badge.demo { background:#344158 !important; color:#D7DEEB !important; }
+.status.neutral { background:#344158 !important; color:#F7F8FC !important; }
+.stButton > button, .stDownloadButton > button { background:#202B3D !important; color:#F7F8FC !important; border-color:#344158 !important; }
+.stButton > button:hover { border-color:#9387FF !important; color:#FFFFFF !important; }
+.stButton > button[kind="primary"] { background:#9387FF !important; border-color:#9387FF !important; color:#111827 !important; }
+.hero { background:#111827 !important; }
+.hero p { color:#D7DEEB !important; }
+.hero .stTextInput input { background:#202B3D !important; color:#F7F8FC !important; }
+.rule-box { background:#202B3D !important; border-color:#344158 !important; }
+.rule-box.green { background:#17382F !important; border-color:#286B58 !important; }
+.rule-box.amber { background:#493719 !important; border-color:#80602B !important; }
+.rule-box.red { background:#49222D !important; border-color:#813B4A !important; }
+.progress-line { background:#344158 !important; }
+input, textarea, [data-baseweb="select"] > div { color:#F7F8FC !important; background:#202B3D !important; border-color:#3B4961 !important; }
+input::placeholder, textarea::placeholder { color:#B8C2D9 !important; }
+[role="listbox"], [data-baseweb="menu"], [role="option"] { background:#202B3D !important; color:#F7F8FC !important; }
+[role="option"]:hover, [role="option"][aria-selected="true"] { background:#302C50 !important; color:#FFFFFF !important; }
+[data-baseweb="select"] svg { fill:#B8C2D9 !important; color:#B8C2D9 !important; }
+.theme-label { color:#B8C2D9 !important; }
+</style>
+"""
+else:
+    theme_css = """
+<style>
+.stApp, [data-testid="stMain"] { background:#F7F8FC !important; }
+</style>
+"""
+st.markdown(common_control_css + theme_css, unsafe_allow_html=True)
 
 @st.cache_data
 def get_opportunities() -> list[Opportunity]:
@@ -135,22 +223,28 @@ saved = storage.saved_items()
 page = st.session_state.get("page", "Overview")
 
 with st.sidebar:
-    st.markdown('<div class="brand"><div class="brand-mark">✦</div><div><div class="brand-name">OpportunityKit</div><div class="brand-sub">Your opportunity companion</div></div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="brand"><img src="{LOGO_LIGHT_DATA}" alt="OpportunityKit logo" /></div>', unsafe_allow_html=True)
     choice = st.radio("Workspace", NAV_ITEMS, index=NAV_ITEMS.index(page) if page in NAV_ITEMS else 0, label_visibility="collapsed")
     if choice != page:
         st.session_state["page"] = choice
         page = choice
     st.markdown('<div class="sidebar-note"><b>Local-first by design</b><br>Your profile and saved opportunities stay on this device. Fit Reports use Gemma through Ollama when available.</div>', unsafe_allow_html=True)
+    st.markdown('<div class="theme-label">Appearance</div>', unsafe_allow_html=True)
+    dark_mode = st.toggle("Dark mode", value=theme == "dark", help="Switch the workspace theme without changing your page or data.")
+    if dark_mode != (theme == "dark"):
+        st.session_state["theme"] = "dark" if dark_mode else "light"
+        st.rerun()
     st.caption("OpportunityKit · demo build")
 
 # OVERVIEW
 if page == "Overview":
     greeting = f"Welcome back, {profile.name}." if profile.name else "Make your next opportunity easier to find."
-    st.markdown(f'<div class="hero"><div class="eyebrow" style="color:#9da1ff">YOUR OPPORTUNITY DESK</div><h1>{greeting}</h1><p>Discover opportunities that fit your profile, understand the requirements, and move forward with a clear plan.</p></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="hero"><div class="hero-kicker">Discover your next opportunity</div><h1>{greeting}</h1><p>Find internships, scholarships, hackathons and more. Understand your fit, see what is missing, and take the next step with confidence.</p><div class="hero-actions"><span class="badge" style="background:#75e6c4;color:#0b1933">Local-first</span><span style="color:#bac5dc;font-size:.78rem">Rules you can inspect. AI that stays grounded.</span></div></div>', unsafe_allow_html=True)
     search = st.text_input("Search your next opportunity", placeholder="Search by skill, category, or organization", label_visibility="collapsed")
     if search:
         st.session_state["search_query"] = search
         go("Discover")
+    st.markdown('<div class="feature-strip"><div class="feature-card"><div class="feature-icon">⌕</div><h3>Discover clearly</h3><p>Search a curated catalogue with transparent relevance scores.</p></div><div class="feature-card"><div class="feature-icon">✓</div><h3>Know your fit</h3><p>Deterministic Python rules show eligible, unknown and conflicting requirements.</p></div><div class="feature-card"><div class="feature-icon">↗</div><h3>Move forward</h3><p>Save ideas, track application status and keep next steps visible.</p></div><div class="feature-card"><div class="feature-icon">✦</div><h3>Get context</h3><p>Use local Gemma for a grounded Fit Report, with a useful offline fallback.</p></div></div>', unsafe_allow_html=True)
     if not profile.education_level or not profile.skills:
         st.markdown('<div class="surface"><div class="eyebrow">START HERE</div><h2>Complete your profile to unlock better matches</h2><p class="muted">Add your education, skills, and interests once. OpportunityKit will use them to explain which listings deserve your attention.</p></div>', unsafe_allow_html=True)
         if st.button("Build my profile", type="primary"): go("Student profile")
@@ -177,6 +271,7 @@ if page == "Overview":
         c1.markdown(f"**{opp.title}**  \n<span class='muted'>{opp.organization} · {opp.category}</span>", unsafe_allow_html=True)
         c2.markdown(f"Deadline **{opp.deadline}**")
         if c3.button("View", key=f"deadline-{opp.id}"): go("Opportunity details", opp.id)
+    st.markdown('<div class="footer-note">OpportunityKit is a local-first demo. Listings are fictional demo data; always verify deadlines and requirements at the official source.</div>', unsafe_allow_html=True)
 
 # DISCOVER
 elif page == "Discover":
@@ -201,19 +296,23 @@ elif page == "Discover":
     if sort == "Relevance": filtered.sort(key=lambda x: x[1].score, reverse=True)
     elif sort == "Deadline soonest": filtered.sort(key=lambda x: x[0].deadline)
     else: filtered.sort(key=lambda x: x[0].last_verified, reverse=True)
-    st.markdown(f'<div class="section-head"><h2>{len(filtered)} opportunities</h2><span>All listings are clearly marked demo data</span></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="results-head"><div><div class="eyebrow">OPPORTUNITY INDEX</div><h2>{len(filtered)} opportunities</h2></div><span class="muted">Demo catalogue · sort by what matters now</span></div>', unsafe_allow_html=True)
     if not filtered:
         st.markdown('<div class="empty"><div class="eyebrow">NO MATCHES</div><h3>Try a broader search</h3><p class="muted">Remove a filter or search for a broader skill, category, or location.</p></div>', unsafe_allow_html=True)
     else:
-        for start in range(0, len(filtered), 3):
-            cols = st.columns(3)
-            for col, (opp, relevance, eligibility) in zip(cols, filtered[start:start+3]):
-                with col:
-                    st.markdown(f'<div class="opp-card"><span class="badge">{opp.category}</span><span class="badge demo">Demo data</span><h3>{opp.title}</h3><p><b>{opp.organization}</b> · {opp.location}</p><p>{opp.description}</p><p>Deadline <b>{opp.deadline}</b></p><div>{status_html(eligibility.status)} <span class="score" style="float:right">{relevance.score}/100</span></div></div>', unsafe_allow_html=True)
-                    b1, b2 = st.columns(2)
-                    if b1.button("Details", key=f"detail-{opp.id}", use_container_width=True): go("Opportunity details", opp.id)
-                    if b2.button("Saved" if opp.id in saved else "Save", key=f"save-{opp.id}", use_container_width=True):
-                        storage.set_saved(opp.id, opp.id not in saved); st.rerun()
+        for opp, relevance, eligibility in filtered:
+            cols = st.columns([2.7, 1.15, 1.25, 1.45])
+            with cols[0]:
+                st.markdown(f'<div class="row-primary"><div><span class="badge">{opp.category}</span> <span class="badge demo">Demo data</span></div><div class="row-title">{opp.title}</div><div class="row-meta"><b>{opp.organization}</b> · {opp.location}<br>{opp.description}</div></div>', unsafe_allow_html=True)
+            with cols[1]:
+                st.markdown(f'<div class="row-label">Deadline</div><div class="row-value">{opp.deadline}</div><div class="row-meta">Last verified {opp.last_verified}</div>', unsafe_allow_html=True)
+            with cols[2]:
+                chip_class = "good" if eligibility.status.startswith("Eligible") else "bad" if eligibility.status.startswith("Not") else ""
+                st.markdown(f'<div class="row-label">Your fit</div><div class="fit-chip {chip_class}">{eligibility.status.replace(" based on available information", "").replace(" / needs verification", "")}</div><div class="row-meta"><span class="score">{relevance.score}/100</span> relevance</div>', unsafe_allow_html=True)
+            with cols[3]:
+                if st.button("Details", key=f"detail-{opp.id}", use_container_width=True): go("Opportunity details", opp.id)
+                if st.button("Saved" if opp.id in saved else "Save", key=f"save-{opp.id}", use_container_width=True):
+                    storage.set_saved(opp.id, opp.id not in saved); st.rerun()
 
 # DETAIL
 elif page == "Opportunity details":

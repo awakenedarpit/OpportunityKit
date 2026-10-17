@@ -18,6 +18,10 @@ OpportunityKit is a local-first, open-source opportunity discovery and eligibili
 
 The score is a measure of profile relevance. It is not a probability of selection or winning.
 
+The visual system uses the exact premium palette documented in [BRAND_GUIDELINES.md](BRAND_GUIDELINES.md): Midnight Navy `#10182B`, Deep Navy `#17213A`, Royal Indigo `#6254E8`, Soft Lavender `#EEEAFE`, Champagne Gold `#D6B779`, Soft Ivory `#F7F8FC`, Pure White `#FFFFFF`, Slate Grey `#596780`, and explicit semantic success, warning, and error colors.
+
+The sidebar also includes a session-preserved Light/Dark mode switch. Light mode is the default and uses white Streamlit/BaseWeb controls; Dark mode uses coordinated dark-slate controls with readable light text. Select menus and their opened option lists are styled explicitly for both themes.
+
 ## Architecture
 
 ```text
@@ -28,6 +32,12 @@ Streamlit UI (app.py)
   ├── ollama_client.py → local Gemma + validated JSON + fallback
   └── storage.py → local SQLite (profile and saved items)
 ```
+
+## Product identity
+
+OpportunityKit uses an original compass-and-path mark to represent discovery, direction, and progress. The visual system combines midnight navy, mint, soft violet, and off-white surfaces. The logo and favicon variants live in `assets/`, and usage rules are documented in [BRAND_GUIDELINES.md](BRAND_GUIDELINES.md).
+
+The Overview screen serves as the product introduction: it explains the promise, surfaces the four core capabilities, and routes directly into the real discovery workflow. No fake testimonials, user counts, or unsupported outcome claims are used.
 
 ## macOS setup
 
