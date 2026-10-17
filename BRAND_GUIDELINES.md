@@ -18,13 +18,19 @@ Keep the mark intact. Do not stretch, rotate, add effects, change the path geome
 
 ## Color system
 
-- Midnight navy `#0B1933` — primary ink, dark hero surfaces, trust.
-- Mint `#75E6C4` — action, progress, opportunity, positive emphasis.
-- Soft violet `#C8B7FF` — secondary accent and directional detail.
-- Off-white `#F7F7F2` — application canvas.
-- Slate `#65738C` — supporting text and metadata.
+- Midnight Navy `#10182B` — hero surfaces and dark navigation.
+- Deep Navy `#17213A` — headings and elevated dark surfaces.
+- Royal Indigo `#6254E8` — primary actions, active navigation, focus, and interaction.
+- Soft Lavender `#EEEAFE` — subtle accent surfaces and selected filters.
+- Champagne Gold `#D6B779` — restrained premium detail and selected highlights.
+- Soft Ivory `#F7F8FC` — application canvas.
+- Pure White `#FFFFFF` — cards and forms.
+- Slate Grey `#596780` — supporting text and metadata.
+- Muted Lavender Grey `#B8C2D9` — secondary text on dark surfaces.
+- Border Grey `#E3E7F0` — dividers and outlines.
+- Success Green `#16866A`, Warning Amber `#A86B16`, Error Red `#C43D52` — semantic states.
 
-Use navy for the strongest hierarchy and mint for focused actions or positive progress. Violet should remain an accent rather than the primary button color. Pair all status colors with text labels; never rely on color alone.
+Use navy for the strongest hierarchy and Royal Indigo for focused actions. Champagne Gold is an accent, never body text or a primary background. Pair all status colors with text labels; never rely on color alone.
 
 ## Typography and UI
 

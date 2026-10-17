@@ -1,4 +1,10 @@
 
+## 2026-10-17 — Premium colour system
+
+- Migrated the application tokens to the required Midnight Navy, Deep Navy, Royal Indigo, Soft Lavender, Champagne Gold, Soft Ivory, Pure White, Slate Grey, and semantic state palette.
+- Updated primary buttons, active navigation, focus rings, hero accents, cards, filters, and status indicators to use the shared tokens.
+- Updated logo and favicon SVG assets to match the Indigo and Champagne identity.
+
 ## 2026-10-17 — Premium UI/UX reset
 
 - Added a live visual audit in `UI_AUDIT.md` before implementation.

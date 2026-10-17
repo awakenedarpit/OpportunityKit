@@ -15,3 +15,7 @@ OpportunityKit now has an original compass-and-path identity with color, dark, l
 ## 2026-10-17 — Premium UI/UX reset
 
 A live browser audit found the earlier version still looked like a generic Streamlit dashboard: light navigation lacked separation, Discover repeated large cards, and the strongest differentiator—transparent fit assessment—was visually diluted. The reset keeps the existing architecture but moves to a dark navigation rail, warm off-white workspace, tighter editorial hierarchy, fewer decorative containers, and a dense opportunity index. `UI_AUDIT.md` records the reasoning. Live Overview and Discover screens were inspected after the change; 11 tests still pass.
+
+## 2026-10-17 — Exact premium palette
+
+The visual tokens now follow the requested system exactly: Midnight Navy `#10182B`, Deep Navy `#17213A`, Royal Indigo `#6254E8`, Soft Lavender `#EEEAFE`, Champagne Gold `#D6B779`, Soft Ivory `#F7F8FC`, Pure White `#FFFFFF`, Slate Grey `#596780`, Muted Lavender Grey `#B8C2D9`, Border Grey `#E3E7F0`, Success Green `#16866A`, Warning Amber `#A86B16`, and Error Red `#C43D52`. Logo and favicon accents were updated in parallel. The live Overview was refreshed and visually checked after the migration.

@@ -18,6 +18,8 @@ OpportunityKit is a local-first, open-source opportunity discovery and eligibili
 
 The score is a measure of profile relevance. It is not a probability of selection or winning.
 
+The visual system uses the exact premium palette documented in [BRAND_GUIDELINES.md](BRAND_GUIDELINES.md): Midnight Navy `#10182B`, Deep Navy `#17213A`, Royal Indigo `#6254E8`, Soft Lavender `#EEEAFE`, Champagne Gold `#D6B779`, Soft Ivory `#F7F8FC`, Pure White `#FFFFFF`, Slate Grey `#596780`, and explicit semantic success, warning, and error colors.
+
 ## Architecture
 
 ```text
