@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import base64
 from datetime import date
+from dataclasses import replace
 from pathlib import Path
 
 import streamlit as st
 
 from src.data_loader import load_opportunities
 from src.demo_data import DEMO_PROFILE, DEMO_SAVED_RECORDS
+from src.ai_provider_manager import AIProviderManager, PROVIDERS, load_ai_settings, masked_key
 from src.eligibility import check_eligibility
 from src.matching import calculate_relevance
 from src.models import Opportunity, StudentProfile
@@ -25,6 +27,23 @@ st.set_page_config(page_title="OpportunityKit · Discover your next opportunity"
 if "theme" not in st.session_state:
     st.session_state["theme"] = "light"
 theme = st.session_state["theme"]
+
+if "ai_external_enabled" not in st.session_state:
+    st.session_state["ai_external_enabled"] = load_ai_settings().external_enabled
+if "ai_priority" not in st.session_state:
+    st.session_state["ai_priority"] = list(load_ai_settings().priority)
+
+
+def current_ai_settings():
+    base = load_ai_settings()
+    providers = dict(base.providers)
+    for name in ("ollama", "openrouter", "gemini", "grok"):
+        config = providers[name]
+        enabled = st.session_state.get(f"ai_enabled_{name}", config.enabled)
+        model = st.session_state.get(f"ai_model_{name}", config.model)
+        providers[name] = replace(config, enabled=enabled, model=model)
+    priority = tuple(st.session_state.get("ai_priority", list(base.priority)))
+    return replace(base, priority=priority, providers=providers, external_enabled=st.session_state["ai_external_enabled"])
 
 st.markdown("""
 <style>
@@ -372,8 +391,11 @@ elif page == "Fit Report":
         for label, value in relevance.components.items(): st.write(f"{label} · **{value}**"); st.progress(value / (45 if label == "Skills overlap" else 20 if label == "Interest/category" else 15 if label == "Education alignment" else 10))
         st.markdown('</div>', unsafe_allow_html=True)
     if st.button("Generate grounded Fit Report", type="primary"):
-        with st.spinner("Checking local Gemma through Ollama…"):
-            st.session_state["report"] = generate_fit_report(profile, opp, eligibility)
+        with st.spinner("Checking configured AI providers…"):
+            manager = AIProviderManager(current_ai_settings())
+            st.session_state["report"] = manager.generate_fit_report(profile, opp, eligibility)
+            st.session_state["ai_last_status"] = manager.last_status
+            st.session_state["ai_last_error"] = manager.last_error
     report = st.session_state.get("report")
     if report:
         st.caption(f"Explanation source: {report.source}")
@@ -457,7 +479,33 @@ else:
     with c1:
         st.markdown('<div class="surface"><div class="eyebrow">HOW IT WORKS</div><h3>Rules first. AI second.</h3><p>The deterministic eligibility engine checks explicit requirements in Python. The relevance score shows its components. Local Gemma only turns those supplied facts into a clearer Fit Report.</p></div>', unsafe_allow_html=True)
     with c2:
-        st.markdown('<div class="surface"><div class="eyebrow">TRUST</div><h3>Verify before applying.</h3><p>Every listing shows its source, verification date, and data status. The current catalogue is fictional demo data. Confirm all deadlines and requirements at the official source.</p></div>', unsafe_allow_html=True)
+        st.markdown('<div class="surface"><div class="eyebrow">TRUST</div><h3>Verify before applying.</h3><p>Every listing shows its source, verification date, and data status. The catalogue is synthetic demo data; new demo records have no external application link. Confirm all deadlines and requirements at the official source.</p></div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-head"><h2>AI Settings</h2><span>Rules remain authoritative</span></div>', unsafe_allow_html=True)
+    with st.expander("Configure provider priority and fallback", expanded=False):
+        ai_base = load_ai_settings()
+        st.toggle("Allow external AI providers", key="ai_external_enabled", help="When enabled, profile and opportunity evidence may be sent to configured external providers. Ollama and the deterministic fallback remain local.")
+        st.caption("External providers may process submitted prompts. No provider is contacted until you explicitly enable this control.")
+        order = st.multiselect("Fallback order", [name for name in PROVIDERS if name != "fallback"], default=[name for name in st.session_state.get("ai_priority", list(ai_base.priority)) if name != "fallback"])
+        st.session_state["ai_priority"] = order + ["fallback"]
+        cols = st.columns(2)
+        for index, name in enumerate(("ollama", "openrouter", "gemini", "grok")):
+            config = ai_base.provider(name)
+            with cols[index % 2]:
+                st.checkbox(f"Enable {name.title()}", value=config.enabled, key=f"ai_enabled_{name}")
+                st.text_input(f"{name.title()} model", value=config.model, key=f"ai_model_{name}")
+                if name != "ollama":
+                    st.caption(f"API key: {masked_key(config.api_key)} · configure via environment or Streamlit secrets")
+                else:
+                    st.caption(f"Local endpoint: {config.endpoint} · model: {config.model}")
+        test_provider = st.selectbox("Provider health check", [name for name in PROVIDERS if name != "fallback"])
+        if st.button("Test provider configuration"):
+            manager = AIProviderManager(current_ai_settings())
+            ok, message = manager.test_provider(test_provider)
+            (st.success if ok else st.warning)(f"{test_provider.title()}: {message}")
+        last_error = st.session_state.get("ai_last_error")
+        if last_error:
+            st.caption(f"Last non-sensitive provider status: {last_error}")
+        st.caption("Built-in deterministic fallback is always enabled and cannot change eligibility.")
     st.markdown('<div class="section-head"><h2>Local-first setup</h2></div>', unsafe_allow_html=True)
     st.code("ollama pull gemma4:e4b\n# lighter fallback\nollama pull gemma4:e2b")
     st.caption("No paid API key is required for the core demonstration. See README for setup, testing, and limitations.")

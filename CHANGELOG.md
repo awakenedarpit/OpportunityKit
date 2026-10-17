@@ -1,4 +1,11 @@
 
+## 2026-10-17 — Multi-provider AI fallback
+
+- Added `src/ai_provider_manager.py` with Ollama, OpenRouter, Gemini, xAI Grok, and deterministic fallback adapters.
+- Added bounded priority fallback, explicit external-AI consent, model/key configuration checks, masked key status, and provider health controls.
+- Preserved deterministic eligibility as the source of truth; all generated reports are schema-validated against it.
+- Added mocked tests for provider priority, unavailable providers, missing keys, authentication errors, timeouts/rate-limit-style failures, fallback, and invalid model output.
+
 ## 2026-10-17 — Presentation demo data
 
 - Added eight realistic but explicitly synthetic opportunity records with fictional organizations and no external application links.

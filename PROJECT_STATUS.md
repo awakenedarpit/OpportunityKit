@@ -6,6 +6,8 @@
 
 The Streamlit app now has a dark navigation rail, editorial opportunity index, tighter type and spacing hierarchy, restrained borders/radii, stronger Overview first-run state, original OpportunityKit logo system, favicon, the required premium colour tokens, and reduced-motion support. It also has a session-based Light/Dark mode switch with coordinated Streamlit control and dropdown styling. It keeps the configurable local Ollama client: URL, Gemma model tag, and timeout are environment-driven, remote endpoints are rejected, model availability is checked when possible, and an explicit rule-based fallback appears when local AI is unavailable or unsafe to use.
 
+The AI layer now uses a centralized provider manager with Ollama, OpenRouter, Gemini, Grok, and deterministic fallback adapters. External providers are disabled by default, require explicit model/key configuration plus user enablement, and never change deterministic eligibility. The About page exposes provider order, toggles, masked key status, model identifiers, and non-sensitive health checks.
+
 ## Preserved behavior
 
 Eligibility remains deterministic Python logic. Relevance remains an explainable score. SQLite persistence, discovery filters, deadline tracking, demo-data labels, and the premium UI remain intact. The model cannot override the eligibility result because the response is schema-validated and its eligibility summary is compared to the rule-engine result.
@@ -20,6 +22,7 @@ Eligibility remains deterministic Python logic. Relevance remains an explainable
 - Logo assets and the brand guidelines document are included under `assets/` and `BRAND_GUIDELINES.md`.
 - Live Overview and Discover screens were visually inspected in the sandbox browser after the reset.
 - Discover Category dropdown was opened and inspected in both Light and Dark modes; theme switching preserved the Discover page.
+- Multi-provider fallback behavior is covered by mocked tests; no real external API key or paid request was used.
 
 ## Manual steps on the Mac
 

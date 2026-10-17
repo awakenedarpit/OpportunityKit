@@ -54,13 +54,14 @@ def fallback_report(profile: StudentProfile, opportunity: Opportunity, eligibili
     if not strengths:
         strengths = ["Your profile has been compared using the information you entered."]
     source = "Rule-based fallback" if not reason else f"Rule-based fallback · {reason}"
+    source_reference = f"Official source: {opportunity.source_url}" if opportunity.source_url else "Source: synthetic demo record — no external application link"
     return FitReport(
         why_match=[f"This is a {opportunity.category.lower()} opportunity from {opportunity.organization}.", *strengths[:2]],
         eligibility_summary=eligibility.status,
         strengths=strengths,
         gaps=gaps or ["No specific gaps were identified by the available rules; verify the official listing."],
         next_steps=["Read the official listing carefully.", "Prepare evidence for the required skills.", "Confirm all eligibility details before applying."],
-        before_applying=[f"Deadline: {opportunity.deadline}", f"Official source: {opportunity.source_url}", "This is demo data; verify current details on the source page."],
+        before_applying=[f"Deadline: {opportunity.deadline}", source_reference, "This is demo data; verify current details before applying."],
         source=source,
     )
 

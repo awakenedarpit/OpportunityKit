@@ -24,6 +24,16 @@ The sidebar also includes a session-preserved Light/Dark mode switch. Light mode
 
 The catalogue includes eight additional presentation-ready synthetic opportunities, a fictional B.Tech Computer Science student profile, three seeded saves, and two sample in-progress applications. Every new listing is marked `DEMO DATA — NOT A REAL OPPORTUNITY` and has no external application URL. Demo seeding is idempotent, preserves user-owned records, and can be loaded or cleared from the About page.
 
+## Multi-provider AI
+
+Fit Reports use the provider manager in `src/ai_provider_manager.py`. The default order is Ollama, OpenRouter, Google Gemini, xAI Grok, then the built-in deterministic fallback. Eligibility is always calculated by the existing Python rules; providers may only explain that result.
+
+Ollama is local and can use the existing `OPPORTUNITYKIT_OLLAMA_URL`, `OPPORTUNITYKIT_MODEL`, and `OPPORTUNITYKIT_OLLAMA_TIMEOUT` variables. External providers are disabled by default and require all three safeguards: configure the provider API key, configure an explicit model identifier, and enable **Allow external AI providers** under About → AI Settings. The app never silently chooses an external model that could incur charges.
+
+Supported environment variables are `OPENROUTER_API_KEY`, `GEMINI_API_KEY`, and `XAI_API_KEY`, plus `OPPORTUNITYKIT_OPENROUTER_MODEL`, `OPPORTUNITYKIT_GEMINI_MODEL`, and `OPPORTUNITYKIT_GROK_MODEL`. Optional provider flags are `OPPORTUNITYKIT_OPENROUTER_ENABLED`, `OPPORTUNITYKIT_GEMINI_ENABLED`, and `OPPORTUNITYKIT_GROK_ENABLED`. `OPPORTUNITYKIT_AI_PRIORITY`, `OPPORTUNITYKIT_AI_TIMEOUT`, and `OPPORTUNITYKIT_AI_MAX_ATTEMPTS` control ordering and bounded execution. Use `.env.example` as a template; never commit `.env` or populated Streamlit secrets.
+
+The About → AI Settings panel shows masked key status, configured models, provider toggles, fallback order, and a non-sensitive configuration check. External providers may process profile and opportunity evidence, so enable them only after reviewing their policies. For Render, add the variables in the service Environment settings, keep external AI disabled until keys and models are configured, then redeploy. Render does not need Ollama installed; the local adapter simply falls through to the next enabled provider or deterministic fallback.
+
 ## Architecture
 
 ```text

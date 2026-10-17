@@ -27,3 +27,7 @@ The app now defaults to Light mode and exposes a sidebar Dark mode toggle backed
 ## 2026-10-17 — Presentation demo data
 
 The catalogue now has 23 records, including eight new synthetic listings for a hackathon presentation. `src/demo_data.py` owns the fictional profile and seeded save/application plan. `Storage` tracks `origin` on saved records and `profile_origin`/demo metadata in SQLite. Startup seeds only a pristine database; About provides repeatable Load/Clear controls. Demo records have no external URLs and are visibly labeled as not real. Existing user records are preserved during seed and clear operations.
+
+## 2026-10-17 — Multi-provider AI
+
+`src/ai_provider_manager.py` centralizes Fit Report generation across local Ollama, OpenRouter, Google Gemini, xAI Grok, and the deterministic fallback. Default priority is Ollama → OpenRouter → Gemini → Grok → fallback, but external providers are disabled unless the user enables them in About and has supplied an explicit model and environment-backed key. Provider errors are bounded and redacted; authentication failures are not retried for the same provider. Every provider response is schema-checked and must preserve the deterministic eligibility status.
