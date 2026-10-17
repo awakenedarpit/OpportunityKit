@@ -20,7 +20,7 @@ The score is a measure of profile relevance. It is not a probability of selectio
 
 The visual system uses the exact premium palette documented in [BRAND_GUIDELINES.md](BRAND_GUIDELINES.md): Midnight Navy `#10182B`, Deep Navy `#17213A`, Royal Indigo `#6254E8`, Soft Lavender `#EEEAFE`, Champagne Gold `#D6B779`, Soft Ivory `#F7F8FC`, Pure White `#FFFFFF`, Slate Grey `#596780`, and explicit semantic success, warning, and error colors.
 
-The sidebar also includes a session-preserved Light/Dark mode switch. Light mode is the default and uses white Streamlit/BaseWeb controls; Dark mode uses coordinated dark-slate controls with readable light text. Select menus and their opened option lists are styled explicitly for both themes.
+The sidebar also includes a session-preserved Light/Dark mode switch. Dark mode is the default and uses coordinated dark-slate controls with readable light text; Light mode uses white Streamlit/BaseWeb controls. Select menus and their opened option lists are styled explicitly for both themes.
 
 The catalogue includes eight additional presentation-ready synthetic opportunities, a fictional B.Tech Computer Science student profile, three seeded saves, and two sample in-progress applications. Every new listing is marked `DEMO DATA — NOT A REAL OPPORTUNITY` and has no external application URL. Demo seeding is idempotent, preserves user-owned records, and can be loaded or cleared from the About page.
 

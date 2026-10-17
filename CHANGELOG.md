@@ -1,4 +1,9 @@
 
+## 2026-10-17 — Dark mode default
+
+- Changed the initial OpportunityKit theme from Light to Dark mode.
+- Preserved the session-based Light/Dark toggle and both theme-specific control styles.
+
 ## 2026-10-17 — Multi-provider AI fallback
 
 - Added `src/ai_provider_manager.py` with Ollama, OpenRouter, Gemini, xAI Grok, and deterministic fallback adapters.

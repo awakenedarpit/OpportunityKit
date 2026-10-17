@@ -25,7 +25,7 @@ NAV_ITEMS = ["Overview", "Discover", "Saved opportunities", "Application tracker
 st.set_page_config(page_title="OpportunityKit · Discover your next opportunity", page_icon=str(ROOT / "assets" / "favicon.svg"), layout="wide", initial_sidebar_state="expanded")
 
 if "theme" not in st.session_state:
-    st.session_state["theme"] = "light"
+    st.session_state["theme"] = "dark"
 theme = st.session_state["theme"]
 
 if "ai_external_enabled" not in st.session_state:
