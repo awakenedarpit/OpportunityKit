@@ -22,6 +22,8 @@ The visual system uses the exact premium palette documented in [BRAND_GUIDELINES
 
 The sidebar also includes a session-preserved Light/Dark mode switch. Light mode is the default and uses white Streamlit/BaseWeb controls; Dark mode uses coordinated dark-slate controls with readable light text. Select menus and their opened option lists are styled explicitly for both themes.
 
+The catalogue includes eight additional presentation-ready synthetic opportunities, a fictional B.Tech Computer Science student profile, three seeded saves, and two sample in-progress applications. Every new listing is marked `DEMO DATA — NOT A REAL OPPORTUNITY` and has no external application URL. Demo seeding is idempotent, preserves user-owned records, and can be loaded or cleared from the About page.
+
 ## Architecture
 
 ```text

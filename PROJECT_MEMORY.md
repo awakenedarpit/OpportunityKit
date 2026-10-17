@@ -23,3 +23,7 @@ The visual tokens now follow the requested system exactly: Midnight Navy `#10182
 ## 2026-10-17 — Light/Dark mode and controls
 
 The app now defaults to Light mode and exposes a sidebar Dark mode toggle backed by `st.session_state["theme"]`. The active theme is applied through centralized CSS variables and theme-specific component overrides. Streamlit/BaseWeb select menus, search inputs, text inputs, and forms use white surfaces with navy text in Light mode and `#202B3D` dark-slate surfaces with light text in Dark mode. The Discover Category menu was opened and visually checked in both themes; switching back preserved the Discover page.
+
+## 2026-10-17 — Presentation demo data
+
+The catalogue now has 23 records, including eight new synthetic listings for a hackathon presentation. `src/demo_data.py` owns the fictional profile and seeded save/application plan. `Storage` tracks `origin` on saved records and `profile_origin`/demo metadata in SQLite. Startup seeds only a pristine database; About provides repeatable Load/Clear controls. Demo records have no external URLs and are visibly labeled as not real. Existing user records are preserved during seed and clear operations.

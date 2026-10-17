@@ -1,4 +1,12 @@
 
+## 2026-10-17 — Presentation demo data
+
+- Added eight realistic but explicitly synthetic opportunity records with fictional organizations and no external application links.
+- Added a fictional B.Tech Computer Science student profile, three seeded saves, and two seeded in-progress application examples.
+- Added idempotent SQLite demo seeding with origin tracking so user-created profile and saved records are never overwritten or removed.
+- Added About-page Load demo data and confirmed Clear demo data controls.
+- Verified the populated Overview, 23-record Discover catalogue, and Application tracker in the live Streamlit preview.
+
 ## 2026-10-17 — Light/Dark mode and dropdown repair
 
 - Added a Light/Dark mode toggle in the sidebar, defaulting to Light mode and stored in Streamlit session state.

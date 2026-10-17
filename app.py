@@ -7,6 +7,7 @@ from pathlib import Path
 import streamlit as st
 
 from src.data_loader import load_opportunities
+from src.demo_data import DEMO_PROFILE, DEMO_SAVED_RECORDS
 from src.eligibility import check_eligibility
 from src.matching import calculate_relevance
 from src.models import Opportunity, StudentProfile
@@ -218,6 +219,8 @@ def go(page: str, opportunity_id: str | None = None) -> None:
 
 storage = Storage(ROOT / "opportunitykit.db")
 opportunities = get_opportunities()
+if not storage.has_any_records() and storage.get_meta("demo_disabled") != "1":
+    storage.seed_demo_data(DEMO_PROFILE, DEMO_SAVED_RECORDS)
 profile = storage.load_profile() or StudentProfile()
 saved = storage.saved_items()
 page = st.session_state.get("page", "Overview")
@@ -263,7 +266,7 @@ if page == "Overview":
         cols = st.columns(3)
         for col, (opp, relevance, eligibility) in zip(cols, ranked):
             with col:
-                st.markdown(f'<div class="opp-card"><span class="badge">{opp.category}</span><span class="badge demo">Demo data</span><h3>{opp.title}</h3><p><b>{opp.organization}</b> · {opp.location}</p><p>Deadline <b>{opp.deadline}</b></p><div class="card-footer"><span class="score">{relevance.score}/100</span> <span class="muted">profile relevance</span></div></div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="opp-card"><span class="badge">{opp.category}</span><span class="badge demo">DEMO DATA · NOT REAL</span><h3>{opp.title}</h3><p><b>{opp.organization}</b> · {opp.location}</p><p>Deadline <b>{opp.deadline}</b></p><div class="card-footer"><span class="score">{relevance.score}/100</span> <span class="muted">profile relevance</span></div></div>', unsafe_allow_html=True)
                 if st.button("View opportunity", key=f"overview-{opp.id}", use_container_width=True): go("Opportunity details", opp.id)
     st.markdown('<div class="section-head"><h2>Upcoming deadlines</h2><span>Always verify details at the source</span></div>', unsafe_allow_html=True)
     for opp in upcoming:
@@ -303,7 +306,7 @@ elif page == "Discover":
         for opp, relevance, eligibility in filtered:
             cols = st.columns([2.7, 1.15, 1.25, 1.45])
             with cols[0]:
-                st.markdown(f'<div class="row-primary"><div><span class="badge">{opp.category}</span> <span class="badge demo">Demo data</span></div><div class="row-title">{opp.title}</div><div class="row-meta"><b>{opp.organization}</b> · {opp.location}<br>{opp.description}</div></div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="row-primary"><div><span class="badge">{opp.category}</span> <span class="badge demo">DEMO DATA · NOT REAL</span></div><div class="row-title">{opp.title}</div><div class="row-meta"><b>{opp.organization}</b> · {opp.location}<br>{opp.description}</div></div>', unsafe_allow_html=True)
             with cols[1]:
                 st.markdown(f'<div class="row-label">Deadline</div><div class="row-value">{opp.deadline}</div><div class="row-meta">Last verified {opp.last_verified}</div>', unsafe_allow_html=True)
             with cols[2]:
@@ -324,7 +327,7 @@ elif page == "Opportunity details":
     eligibility = check_eligibility(profile, opp)
     relevance = calculate_relevance(profile, opp)
     st.button("← Back to discover", on_click=lambda: st.session_state.update(page="Discover"))
-    st.markdown(f'<div class="detail-hero"><span class="badge">{opp.category}</span><span class="badge demo">Demo data · {opp.verification_status}</span><h1>{opp.title}</h1><div class="detail-meta">{opp.organization} · {opp.location} · Deadline {opp.deadline}</div></div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="detail-hero"><span class="badge">{opp.category}</span><span class="badge demo">DEMO DATA · NOT A REAL OPPORTUNITY</span><h1>{opp.title}</h1><div class="detail-meta">{opp.organization} · {opp.location} · Deadline {opp.deadline}</div></div>', unsafe_allow_html=True)
     left, right = st.columns([1.75, 1])
     with left:
         st.markdown('<div class="surface"><div class="eyebrow">ABOUT THE OPPORTUNITY</div><h2>Overview</h2>', unsafe_allow_html=True)
@@ -338,7 +341,8 @@ elif page == "Opportunity details":
         st.markdown(f'<div class="rule-box {rule_class(eligibility.status)}"><div class="eyebrow">RULE-BASED ASSESSMENT</div><h3>{eligibility.status}</h3><p class="muted">This assessment uses the information in your profile and the listing requirements.</p></div>', unsafe_allow_html=True)
         st.markdown(f'<div class="surface" style="margin-top:1rem"><div class="eyebrow">PROFILE RELEVANCE</div><div class="score-number">{relevance.score}<span style="font-size:1rem">/100</span></div><p class="muted">Relevance is not selection probability.</p><div class="progress-line"><div style="width:{relevance.score}%"></div></div></div>', unsafe_allow_html=True)
     st.markdown('<div class="section-head"><h2>Before you apply</h2><span>Facts to verify at the source</span></div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="surface"><b>Last verified:</b> {opp.last_verified}<br><b>Source:</b> <a href="{opp.source_url}" target="_blank">{opp.source_url}</a><br><span class="muted">This is fictional demo data. Do not use this placeholder as a real application link.</span></div>', unsafe_allow_html=True)
+    source_line = f'<b>Source:</b> {opp.source_url}' if opp.source_url else '<b>Source:</b> Synthetic demo record — no external application link'
+    st.markdown(f'<div class="surface"><b>Last verified:</b> {opp.last_verified}<br>{source_line}<br><span class="muted">This is fictional demo data. Do not use this listing as a real application link.</span></div>', unsafe_allow_html=True)
     a, b = st.columns(2)
     with a:
         if st.button("Remove from saved" if opp.id in saved else "Save opportunity", type="primary", use_container_width=True): storage.set_saved(opp.id, opp.id not in saved); st.rerun()
@@ -380,7 +384,8 @@ elif page == "Fit Report":
             st.markdown('</div>', unsafe_allow_html=True)
         st.markdown('<div class="report-panel"><h3>Before applying</h3>', unsafe_allow_html=True)
         for item in report.before_applying: st.write("• " + item)
-        st.markdown(f"<p class='muted'>Source: <a href='{opp.source_url}' target='_blank'>{opp.source_url}</a> · Last verified {opp.last_verified} · Demo data</p></div>", unsafe_allow_html=True)
+        source_line = f"Source: {opp.source_url}" if opp.source_url else "Source: Synthetic demo record — no external application link"
+        st.markdown(f"<p class='muted'>{source_line} · Last verified {opp.last_verified} · Demo data</p></div>", unsafe_allow_html=True)
     else:
         st.markdown('<div class="empty"><h3>Your evidence-based report is ready when you are</h3><p class="muted">Generate a grounded explanation using local Gemma, or continue with the deterministic assessment above.</p></div>', unsafe_allow_html=True)
 
@@ -398,7 +403,9 @@ elif page in {"Saved opportunities", "Application tracker"}:
         st.markdown('<div class="empty"><div class="eyebrow">A QUIET START</div><h3>No saved opportunities yet</h3><p class="muted">Save a listing from Discover when it feels worth a closer look.</p></div>', unsafe_allow_html=True)
         if st.button("Browse opportunities", type="primary"): go("Discover")
     else:
-        st.caption(f"{len(records)} saved {('application' if tracker else 'opportunity')}{'' if len(records) == 1 else 'ies'}")
+        noun = "application" if tracker else "opportunity"
+        plural = "s" if len(records) != 1 else ""
+        st.caption(f"{len(records)} saved {noun}{plural}")
         for opp, record in sorted(records, key=lambda x: x[0].deadline):
             eligibility = check_eligibility(profile, opp)
             with st.container(border=True):
@@ -454,3 +461,16 @@ else:
     st.markdown('<div class="section-head"><h2>Local-first setup</h2></div>', unsafe_allow_html=True)
     st.code("ollama pull gemma4:e4b\n# lighter fallback\nollama pull gemma4:e2b")
     st.caption("No paid API key is required for the core demonstration. See README for setup, testing, and limitations.")
+    st.markdown('<div class="surface" style="margin-top:1rem"><div class="eyebrow">DEMO DATA</div><h3>Presentation-ready sample workspace</h3><p>Load a fictional student profile, saved opportunities, two in-progress application examples, three upcoming deadlines, and explainable recommendations. Seeding is idempotent and never overwrites user-created records.</p></div>', unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+    with c1:
+        if st.button("Load demo data", type="primary", use_container_width=True):
+            storage.seed_demo_data(DEMO_PROFILE, DEMO_SAVED_RECORDS)
+            st.success("Synthetic demo data loaded.")
+            st.rerun()
+    with c2:
+        confirm_clear = st.checkbox("Confirm clear demo records", key="about-confirm-clear-demo")
+        if st.button("Clear demo data", disabled=not confirm_clear, use_container_width=True):
+            storage.clear_demo_data()
+            st.success("Demo records cleared; user-created records were preserved.")
+            st.rerun()
