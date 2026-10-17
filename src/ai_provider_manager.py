@@ -30,6 +30,7 @@ DEFAULT_MODELS = {
 DEFAULT_TIMEOUT_SECONDS = 30.0
 
 HttpPost = Callable[[str, dict[str, str], dict[str, Any], float], dict[str, Any]]
+HttpGet = Callable[[str, dict[str, str], float], dict[str, Any]]
 
 
 class ProviderConfigurationError(RuntimeError):
@@ -125,6 +126,21 @@ def _http_post(url: str, headers: dict[str, str], payload: dict[str, Any], timeo
         raise ProviderUnavailable("connection or timeout") from exc
 
 
+def _http_get(url: str, headers: dict[str, str], timeout: float) -> dict[str, Any]:
+    request = urllib.request.Request(url, headers=headers, method="GET")
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            return json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        if exc.code in {401, 403}:
+            raise ProviderAuthenticationError(f"authentication failed ({exc.code})") from exc
+        if exc.code in {408, 429} or exc.code >= 500:
+            raise ProviderUnavailable(f"provider HTTP {exc.code}") from exc
+        raise ProviderConfigurationError(f"provider rejected health check ({exc.code})") from exc
+    except (urllib.error.URLError, TimeoutError) as exc:
+        raise ProviderUnavailable("connection or timeout") from exc
+
+
 def _evidence(profile: StudentProfile, opportunity: Opportunity, eligibility: RuleResult) -> str:
     return json.dumps({"profile": profile.__dict__, "opportunity": opportunity.__dict__, "eligibility": eligibility.__dict__}, default=str)
 
@@ -149,9 +165,10 @@ def _parse_report(payload: Any, eligibility: RuleResult, provider_label: str) ->
 
 
 class AIProviderManager:
-    def __init__(self, settings: AISettings | None = None, http_post: HttpPost | None = None) -> None:
+    def __init__(self, settings: AISettings | None = None, http_post: HttpPost | None = None, http_get: HttpGet | None = None) -> None:
         self.settings = settings or load_ai_settings()
         self.http_post = http_post or _http_post
+        self.http_get = http_get or _http_get
         self.last_status: dict[str, str] = {}
         self.last_error: str = ""
 
@@ -247,4 +264,18 @@ class AIProviderManager:
             return False, "External AI is disabled"
         if not config.configured:
             return False, "Provider key or model is not configured"
-        return True, f"{name} is configured; a live generation test runs when a Fit Report is requested"
+        try:
+            if name == "ollama":
+                from ollama import Client
+                Client(host=config.endpoint, timeout=config.timeout_seconds).list()
+            elif name in {"openrouter", "grok"}:
+                self.http_get(config.endpoint + "/models", {"Authorization": f"Bearer {config.api_key}"}, config.timeout_seconds)
+            else:
+                self.http_get(f"{config.endpoint}/models?key={urllib.parse.quote(config.api_key)}", {}, config.timeout_seconds)
+            return True, f"{name} connectivity check succeeded"
+        except ProviderAuthenticationError:
+            return False, "Authentication failed; check the configured key"
+        except (ProviderConfigurationError, ProviderUnavailable):
+            return False, f"{name} is configured but unavailable"
+        except Exception:
+            return False, f"{name} connectivity check failed"
