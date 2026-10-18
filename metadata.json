@@ -1,0 +1,7 @@
+{
+  "name": "OpportunityKit",
+  "description": "A local-first opportunity discovery and eligibility companion for students, with transparent relevance scoring, deterministic rule checks, and grounded fit reports.",
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
